@@ -737,23 +737,213 @@ body{
 /* Responsive Timeline */
 @media (max-width: 768px) {
     .experience-timeline::before {
-        left: 30px;
+        left: 15px;
     }
     
     .experience-item {
-        width: calc(100% - 80px);
-        left: 80px !important;
-        margin-left: 0;
+        width: calc(100% - 50px);
+        margin-left: 50px;
+        padding: 1.5rem;
     }
     
     .experience-item::before {
-        left: -60px !important;
-        right: auto !important;
+        left: -45px;
+        width: 16px;
+        height: 16px;
+        top: 1.5rem;
     }
     
     .experience-item::after {
-        left: -40px !important;
-        right: auto !important;
+        left: -29px;
+        width: 30px;
+    }
+
+    .experience-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .experience-date {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+    }
+
+    .experience-title {
+        font-size: 1.2rem;
+    }
+
+    .experience-description {
+        font-size: 0.9rem;
+    }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+
+    .hero-section {
+        padding: 2rem 1rem;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .hero-section .name {
+        font-size: 2.5rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .section-description {
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
+
+    .carousel-item {
+        min-width: 120px;
+        padding: 1rem;
+    }
+
+    .carousel-item img {
+        width: 48px;
+        height: 48px;
+    }
+
+    .carousel-item span {
+        font-size: 12px;
+    }
+
+    .project-card {
+        padding: 1rem;
+    }
+
+    .project-content {
+        padding: 1rem;
+    }
+
+    .project-image {
+        height: 180px;
+    }
+
+    .certificates-grid {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+
+    .certificate-icon {
+        width: 120px;
+        height: 120px;
+    }
+
+    .info-cards {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+
+    .info-card-carousel {
+        height: 200px;
+    }
+
+    .info-card-image {
+        height: 200px;
+    }
+
+    .info-card-overlay {
+        padding: 1rem;
+    }
+
+    .info-card-title {
+        font-size: 1rem;
+    }
+
+    .info-card-description {
+        font-size: 0.8rem;
+    }
+
+    .cta-title {
+        font-size: 2rem;
+        padding: 0 1rem;
+    }
+
+    .cta-description {
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
+
+    .section-gradient {
+        padding: 1.5rem;
+        margin: 1rem 0;
+    }
+
+    /* Project Header Responsive */
+    .project-content .flex {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .project-content h4 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .project-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section h1 {
+        font-size: 1.5rem;
+    }
+
+    .hero-section .name {
+        font-size: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+    }
+
+    .cta-title {
+        font-size: 1.5rem;
+    }
+
+    .experience-item {
+        width: calc(100% - 40px);
+        margin-left: 40px;
+        padding: 1rem;
+    }
+
+    .experience-item::before {
+        left: -38px;
+        width: 12px;
+        height: 12px;
+    }
+
+    .experience-item::after {
+        left: -26px;
+        width: 25px;
+    }
+
+    .project-card {
+        padding: 0.75rem;
+    }
+
+    .project-content h4 {
+        font-size: 1.1rem;
+    }
+
+    .project-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
     }
 }
 
@@ -762,7 +952,6 @@ html {
 }
 
 
-/* Project Cards */
 .project-card {
     border-radius: 16px;
     overflow: hidden;
@@ -807,16 +996,33 @@ html {
 }
 
 .project-badge {
-  
-    color: white;
+    display: inline-block;
+    color: #1895F3;
     padding: 0.375rem 1rem;
-    border-radius: 6px;
+    border-radius: 20px;
     font-size: 0.875rem;
     font-family: "Montserrat", sans-serif;
     font-weight: 600;
-    border:  1px solid #1895F3;
-    border-radius: 20px;
-    color: #1895F3;
+    border: 1px solid #1895F3;
+    margin: 0.25rem;
+    white-space: nowrap;
+}
+
+.project-content .flex {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+.project-content .flex > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.project-content h4 {
+    flex: 1 1 auto;
+    min-width: 200px;
 }
 
 .project-features {
