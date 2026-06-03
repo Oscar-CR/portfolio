@@ -1,767 +1,408 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> 
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./css/styles.css">
-    
-    <title>Oscar Chávez Rosales - Portafolio</title>
-    
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Oscar Chávez Rosales — Neural Portfolio</title>
+<meta name="description" content="Portafolio de Oscar Chávez Rosales — Ingeniero en TIC, desarrollo de software e IA." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/cyber.css" />
 </head>
 <body>
-    <div class="header">
-        <button class="menu-toggle" id="menuToggle">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <ul class="nav-menu" id="navMenu">
-            <li><a href="#inicio" class="nav-link">Inicio</a></li>
-            <li><a href="#habilidades" class="nav-link">Habilidades técnicas</a></li>
-            <li><a href="#proyectos" class="nav-link">Proyectos</a></li>
-            <li><a href="#experiencia" class="nav-link">Experiencia laboral</a></li>
-            <li><a href="#certificaciones" class="nav-link">Certificaciones</a></li>
-            <li><a href="#informacion" class="nav-link">Información adicional</a></li>
-            <li><a href="#contacto" class="nav-link">Contacto</a></li>
-        </ul>
+
+<!-- ===== BOOT LOADER ===== -->
+<div id="boot">
+  <div class="boot-inner">
+    <div style="font-size:1.1rem;letter-spacing:0.3em;">OCR<span style="color:var(--magenta)">//</span>SYSTEM</div>
+    <div class="boot-bar"><div class="boot-fill"></div></div>
+    <div class="boot-label">INICIALIZANDO NÚCLEO NEURONAL…</div>
+  </div>
+</div>
+
+<!-- ===== BACKGROUND NEURAL NET ===== -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ===== HUD TOP BAR ===== -->
+<header class="hud-bar">
+  <div class="hud-brand">
+    <span class="dot"></span>
+    <span>OCR<span>//</span><b>OSCAR.CR</b></span>
+  </div>
+  <nav class="hud-nav" id="hudNav">
+    <a href="#inicio" class="active" data-i18n="nav.home">Inicio</a>
+    <a href="#habilidades" data-i18n="nav.skills">Habilidades</a>
+    <a href="#proyectos" data-i18n="nav.proj">Proyectos</a>
+    <a href="#experiencia" data-i18n="nav.exp">Experiencia</a>
+    <a href="#certificaciones" data-i18n="nav.cert">Certificados</a>
+    <a href="#informacion" data-i18n="nav.info">Más</a>
+    <a href="#contacto" data-i18n="nav.contact">Contacto</a>
+  </nav>
+  <div class="hud-right">
+    <div class="lang-toggle">
+      <button data-lang="es" class="active">ES</button>
+      <button data-lang="en">EN</button>
+    </div>
+    <button class="menu-toggle" id="menuToggle" aria-label="menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== HERO ===== -->
+  <section id="inicio" class="hero">
+    <div class="hero-text">
+      <p class="hero-hello" data-i18n="hero.hello">// Hola, soy</p>
+      <h1 class="hero-name glitch-text">Oscar Chávez<br />Rosales</h1>
+      <p class="hero-role" data-i18n="hero.role" data-i18n-html>Ingeniero en TIC especializado en <span class="hl">desarrollo de software</span> e integración estratégica de <span class="hl">IA</span>.</p>
+      <div class="hero-tags">
+        <span class="hero-tag">AI / RAG</span>
+        <span class="hero-tag">Laravel</span>
+        <span class="hero-tag">Flutter</span>
+        <span class="hero-tag">Python</span>
+        <span class="hero-tag">Scrum Master</span>
+      </div>
+      <div class="hero-cta">
+        <a href="assets/CV_ChavezRosalesOscar.pdf" class="btn btn-primary" download data-i18n="hero.cta1">Descargar CV</a>
+        <button class="btn btn-ghost" onclick="window.ARIA&&window.ARIA.open()" data-i18n="hero.cta2">Habla con Dyno AI · mi asistente</button>
+      </div>
+    </div>
+    <div class="hero-stage">
+      <span class="mode-name" id="modeName">NEURAL</span>
+      <canvas id="hero-canvas"></canvas>
+      <div class="mode-switch">
+        <span class="lbl">MODO</span>
+        <button data-mode="0" class="active">01</button>
+        <button data-mode="1">02</button>
+        <button data-mode="2">03</button>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span data-i18n="hero.scroll">Desplaza</span>
+      <span class="bar"></span>
+    </div>
+  </section>
+
+  <!-- ===== SKILLS ===== -->
+  <section id="habilidades" class="section reveal">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="skills.eyebrow">Stack técnico</span>
+      <h2 class="section-title" data-i18n="skills.title" data-i18n-html>Habilidades <span class="accent">Técnicas</span></h2>
+      <p class="section-desc" data-i18n="skills.desc" data-i18n-html>He desempeñado roles como <b>Desarrollador Web y Móvil, Diseñador UX/UI, Soporte de Aplicativos N1/N2 y Desarrollador IA</b>, adaptándome al stack que cada reto requiere.</p>
     </div>
 
-    <div id="inicio" class="hero-section">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center justify-items-center px-8 lg:px-20 max-w-7xl mx-auto">
-            <div class="text-white">
-                <h1>¡Hola!, soy</h1>
-                <h1 class="name gradient-name">Oscar Chávez Rosales</h1>
-                <p class="subtitle">Ingeniero en TIC's especializado en desarrollo de software</p>
-                <a href="./assets/CV_ChavezRosalesOscar.pdf" class="btn-download" download>Descargar CV</a>
-            </div>
-            <div class="profile">
-                <img src="./img/profile.png" alt="Foto de perfil de Oscar Chávez Rosales" style="width: 300px; ">
-            </div>
-        </div>
+    <div class="marquee-wrap">
+      <div class="marquee rtl" id="mq1"></div>
+      <div class="marquee ltr" id="mq2"></div>
+      <div class="marquee rtl" id="mq3"></div>
     </div>
 
-    <div id="habilidades" class="text-center px-8 lg:px-20 py-12">
-        <h3 class="section-title gradient-title">Habilidades <span class="highlight">Técnicas</span></h3>
-        <p class="section-description mt-6">A lo largo de mi experiencia profesional, he participado en roles como <b class="text-highlight">Desarrollador Web y Móvil, Diseñador UX/UI, Soporte de Aplicativos (N1/N2) y Desarrollador IA ,</b> adaptándome al stack tecnológico que se requiera.</p>
+    <div class="skill-cats">
+      <div class="skill-cat" data-stagger>
+        <span class="num">01 // AI</span>
+        <h4 data-i18n="cat.ai.title">IA &amp; Machine Learning</h4>
+        <ul data-i18n-list="cat.ai.items"></ul>
+      </div>
+      <div class="skill-cat" data-stagger>
+        <span class="num">02 // WEB</span>
+        <h4 data-i18n="cat.web.title">Web &amp; Backend</h4>
+        <ul data-i18n-list="cat.web.items"></ul>
+      </div>
+      <div class="skill-cat" data-stagger>
+        <span class="num">03 // MOBILE</span>
+        <h4 data-i18n="cat.mobile.title">Móvil</h4>
+        <ul data-i18n-list="cat.mobile.items"></ul>
+      </div>
+      <div class="skill-cat" data-stagger>
+        <span class="num">04 // DESIGN</span>
+        <h4 data-i18n="cat.design.title">Diseño &amp; Gestión</h4>
+        <ul data-i18n-list="cat.design.items"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROJECTS · COMMAND CENTER ===== -->
+  <section id="proyectos" class="section reveal">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="proj.eyebrow">Trabajo seleccionado</span>
+      <h2 class="section-title" data-i18n="proj.title" data-i18n-html>Proyectos <span class="accent">Destacados</span></h2>
+      <p class="section-desc" data-i18n="proj.desc" data-i18n-html>Centro de mando: explora <b>17 sistemas</b> que he construido — de portales B2B y apps en tiendas, a plataformas de IA on-premise.</p>
     </div>
 
-
-    <div class="overflow-hidden py-12 space-y-8">
-
-        <div class="carousel-row">
-            <div class="carousel-content animate-scroll-right">
-                <div class="carousel-item">
-                    <img src="./assets/icons/html5.svg" alt="HTML5">
-                    <span>HTML</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/css3.svg" alt="CSS3">
-                    <span>CSS3</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/javascript.svg" alt="JavaScript">
-                    <span>JavaScript</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/react.svg" alt="React">
-                    <span>React</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/tailwind.svg" alt="Tailwind">
-                    <span>Tailwind</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/bootstrap.svg" alt="Bootstrap">
-                    <span>Bootstrap</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/laravel.svg" alt="Laravel">
-                    <span>Laravel</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/flutter.svg" alt="Flutter">
-                    <span>Flutter</span>
-                </div>
-            </div>
-
-            <div class="carousel-content animate-scroll-right" aria-hidden="true">
-                <div class="carousel-item">
-                    <img src="./assets/icons/html5.svg" alt="HTML5">
-                    <span>HTML</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/css3.svg" alt="CSS3">
-                    <span>CSS3</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/javascript.svg" alt="JavaScript">
-                    <span>JavaScript</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/react.svg" alt="React">
-                    <span>React</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/tailwind.svg" alt="Tailwind">
-                    <span>Tailwind</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/bootstrap.svg" alt="Bootstrap">
-                    <span>Bootstrap</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/laravel.svg" alt="Laravel">
-                    <span>Laravel</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/flutter.svg" alt="Flutter">
-                    <span>Flutter</span>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="carousel-row">
-            
-            <div class="carousel-content animate-scroll-left">
-                <div class="carousel-item">
-                    <img src="./assets/icons/java.svg" alt="Java">
-                    <span>Java</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/dart.svg" alt="Dart">
-                    <span>Dart</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/php.svg" alt="PHP">
-                    <span>PHP</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/python.svg" alt="Python">
-                    <span>Python</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/mysql.svg" alt="MySQL">
-                    <span>MySQL</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/oracle.svg" alt="Oracle DB">
-                    <span>Oracle DB</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/kotlin.svg" alt="Kotlin">
-                    <span>Kotlin</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/swift.svg" alt="Swift">
-                    <span>Swift</span>
-                </div>
-            </div>
-
-            <div class="carousel-content animate-scroll-left" aria-hidden="true">
-                <div class="carousel-item">
-                    <img src="./assets/icons/java.svg" alt="Java">
-                    <span>Java</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/dart.svg" alt="Dart">
-                    <span>Dart</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/php.svg" alt="PHP">
-                    <span>PHP</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/python.svg" alt="Python">
-                    <span>Python</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/mysql.svg" alt="MySQL">
-                    <span>MySQL</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/oracle.svg" alt="Oracle DB">
-                    <span>Oracle DB</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/kotlin.svg" alt="Kotlin">
-                    <span>Kotlin</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/swift.svg" alt="Swift">
-                    <span>Swift</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="carousel-row">
-            <div class="carousel-content animate-scroll-right">
-                <div class="carousel-item">
-                    <img src="./assets/icons/linux.svg" alt="GNU/Linux">
-                    <span>GNU/Linux</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/figma.svg" alt="Figma">
-                    <span>Figma</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/claude.svg" alt="Claude">
-                    <span>Claude</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/openai.svg" alt="OpenAI">
-                    <span>OpenAI</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/ollama.svg" alt="Ollama">
-                    <span>Ollama</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/gemini.svg" alt="Gemini">
-                    <span>Gemini</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/git.svg" alt="Git">
-                    <span>Git</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/github.svg" alt="GitHub" class="invert">
-                    <span>GitHub</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/nodejs.svg" alt="Node.js">
-                    <span>Node.js</span>
-                </div>
-
-            </div>
-
-            <div class="carousel-content animate-scroll-right" aria-hidden="true">
-                <div class="carousel-item">
-                    <img src="./assets/icons/linux.svg" alt="GNU/Linux">
-                    <span>GNU/Linux</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/figma.svg" alt="Figma">
-                    <span>Figma</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/claude.svg" alt="Claude">
-                    <span>Claude</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/openai.svg" alt="OpenAI">
-                    <span>OpenAI</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/gemini.svg" alt="Gemini">
-                    <span>Gemini</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/ollama.svg" alt="Ollama">
-                    <span>Ollama</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/git.svg" alt="Git">
-                    <span>Git</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/github.svg" alt="GitHub" class="invert">
-                    <span>GitHub</span>
-                </div>
-                <div class="carousel-item">
-                    <img src="./assets/icons/nodejs.svg" alt="Node.js">
-                    <span>Node.js</span>
-                </div>
-               
-            </div>
-        </div>
+    <div class="cmd-filters">
+      <button class="cmd-filter active" data-cat="todos" data-i18n="cat.todos">Todos</button>
+      <button class="cmd-filter" data-cat="ia" data-i18n="cat.ia">IA</button>
+      <button class="cmd-filter" data-cat="movil" data-i18n="cat.movil">Móvil</button>
+      <button class="cmd-filter" data-cat="web" data-i18n="cat.web">Web</button>
     </div>
 
-
-    <div id="proyectos" class="text-center px-8 lg:px-20 py-12">
-        <h3 class="section-title gradient-title">Proyectos <span class="highlight">Destacados</span></h3>
+    <div class="cmd-center">
+      <button class="cmd-nav prev" id="cmdPrev" aria-label="anterior">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <div class="cmd-stage" id="cmdStage" tabindex="0">
+        <div class="cmd-track" id="cmdTrack"></div>
+        <div class="cmd-grid-floor" aria-hidden="true"></div>
+      </div>
+      <button class="cmd-nav next" id="cmdNext" aria-label="siguiente">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
     </div>
 
+    <div class="cmd-hud">
+      <div class="cmd-hud-left">
+        <span class="cmd-hud-lbl">SYS.MODULE</span>
+        <span class="cmd-hud-name" id="cmdName">—</span>
+      </div>
+      <div class="cmd-hud-right">
+        <span class="cmd-hud-cat" id="cmdCat">—</span>
+        <span class="cmd-hud-idx mono" id="cmdIdx">01 / 17</span>
+      </div>
+    </div>
+  </section>
 
-    <div class="max-w-7xl mx-auto px-8 pb-20">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="./img/portales.png" alt="E-commerce B2B" class="w-full h-full object-cover">
-                </div>
-                <div class="project-content">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-2xl font-bold text-white">E-commerce B2B</h4>
-                        <span class="project-badge">Laravel</span>
-                    </div>
-                    <p class="text-gray-300 mb-4">
-                        Desarrollé multiples portales de e-commerce b2b a la medida para la compra y cotizaciones de productos.
-                    </p>
-                    <ul class="project-features">
-                        <li>Portales desarrollados con reglas de negocio a la medida, con funcionalidades especificas de acuerdo a roles y permisos.</li>
-                        <li>Conexión del portales a sistemas de compras internas de los clientes.</li>
-                        <li>Stock de productos en tiempo real con apartado de los mismos.</li>
-                        <li>Cotización automatica de productos con personalizador de productos y tecnicas de grabado.</li>
-                        <li>Actualización de IU de acuerdo a temporadas y eventos anuales.</li>
-                    </ul>
-                    <div class="project-footer">
-                        <span class="project-private">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                            </svg>
-                            Web
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="./img/cotizador.png" alt="Proyecto 2" class="w-full h-full object-cover">
-                </div>
-                <div class="project-content">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-2xl font-bold text-white">Cotizador de Proveedores</h4>
-                        <span class="project-badge">Laravel</span>
-                    </div>
-                    <p class="text-gray-300 mb-4">
-                        Desarrollé un cotizador de productos promocionales, conectado al inventario de múltiples proveedores, con stock en tiempo real y cotizaciones.
-                    </p>
-                    <ul class="project-features">
-                        <li>Stock de productos en tiempo real.</li>
-                        <li>Soporte de múltiples formatos para la carga masiva de información de productos (api,csv, xlsx, xml).</li>
-                        <li>Configuración de utilidad y descuentos por proveedor, cliente y vendedor.</li>
-                        <li>Portal para vendedor para realizar cotizaciones, con generación de pdf, email y presentaciones.</li>
-                        <li>Panel administrativo con reportes y estadisticas del sistema.</li>
-                    </ul>
-                    <div class="project-footer">
-                        <span class="project-private">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                            </svg>
-                            Web
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="./img/intranet.png" alt="Proyecto 3" class="w-full h-full object-cover">
-                </div>
-                <div class="project-content">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-2xl font-bold text-white">Intranet Corporativa</h4>
-                        <div>
-                            <span class="project-badge">Laravel</span>
-                            <span class="project-badge">Flutter</span>
-                        </div>
-                    </div>
-                    <p class="text-gray-300 mb-4">
-                        Desarrollé un sistema web y móvil creado para centralizar procesos, facilitar la comunicación y gestionar actividades clave dentro de la organización.
-                    </p>
-                    <ul class="project-features">
-                        <li>Módulo de gestión de vacaciones.</li>
-                        <li>Generación de kit de contratación y bajas. </li>
-                        <li>Cumpleaños del mes. </li>
-                        <li>Aniversarios</li>
-                        <li>Comunicados</li>
-                        <li>Publicaciones.</li>
-                        <li>Catálogo de proveedores.</li>
-                        <li>Tickets de soporte.</li>
-                        <li>Repositorio de documentación interna.</li>
-                    </ul>
-                    <div class="project-footer">
-                        <span class="project-private">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                            </svg>
-                            Web
-                        </span>
-
-                        <a href="https://play.google.com/store/apps/details?id=com.promolife.intranet_movil&pcampaignid=web_share" target="_blank">
-                            <span class="public-project">
-                                <img src="./assets/icons/google-play.svg" alt="Google Play" class="w-4 h-4 invert">
-                                Google Play
-                            </span>
-                        </a>
-                        
-                        <a href="https://apps.apple.com/us/app/intranet-m%C3%B3vil/id6445901024" target="_blank" class="pt-4">
-                            <span class="public-project ">
-                                <img src="./assets/icons/apple-store.svg" alt="App Store" class="w-4 h-4 invert">
-                                App Store
-                            </span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="./img/promonfc.png" alt="Proyecto 4" class="w-full h-full object-cover">
-                </div>
-                <div class="project-content">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-2xl font-bold text-white">Promo NFC</h4>
-                        <span class="project-badge">Flutter</span>
-                    </div>
-                    <p class="text-gray-300 mb-4">
-                        Desarrollé una app móvil de uso interno para el grabado masivo de tarjetas NFC, optimizando el proceso y reduciendo los tiempos significativamente.
-                    </p>
-                    <ul class="project-features">
-                        <li>Lectura de archivos CVS y Excel.</li>
-                        <li>Carga y guardado de listas masivas.</li>
-                        <li>Alta compartibilidad con multiples tarjetas RFID.</li>
-                        <li>Validador de urls y datos grabados.</li>
-                    </ul>
-                    <div class="project-footer">          
-
-                        <a href="https://play.google.com/store/apps/details?id=com.promolife.nfc_app_movil&pcampaignid=web_share" target="_blank">
-                            <span class="public-project">
-                                <img src="./assets/icons/google-play.svg" alt="Google Play" class="w-4 h-4 invert">
-                                Google Play
-                            </span>
-                        </a>
-
-                    </div>
-                </div>
-            </div>
-
-              <div class="project-card">
-                <div class="project-image">
-                    <img src="./img/segurapp.png" alt="Proyecto 4" class="w-full h-full object-cover">
-                </div>
-                <div class="project-content">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-2xl font-bold text-white">SegurApp</h4>
-                        <div>
-                            <span class="project-badge">Java</span>
-                            <span class="project-badge">Kotlin</span>
-                        </div>
-                       
-                    </div>
-                    <p class="text-gray-300 mb-4">
-                        Desarrollé un aplicación de seguridad personal, con servicios de rastreo en tiempo real a contactos de confianza.
-                    </p>
-                    <ul class="project-features">
-                        <li>Envió de notificaciones push de Firebase Cloud Messaging.</li>
-                        <li>Uso de mapbox para visualización y trackeo de posición.</li>
-                        <li>Acceso a hardware como gps, almacenamiento interno.</li>
-                        <li>Integración de APIS a servicios de seguridad público.</li>
-                        <li>Uso de Firestore como base de datos y room para manejo local de datos en sqlite.</li>
-                    </ul>
-                    <div class="project-footer">
-                        <a href="https://github.com/Oscar-CR/bedu-segurapp" target="_blank">
-                            <span class="public-project">
-                                <img src="./assets/icons/github.svg" alt="Github" class="w-4 h-4 invert">
-                                Repositorio
-                            </span>
-                        </a>
-
-                    </div>
-                </div>
-            </div>
-
-        </div>
+  <!-- ===== EXPERIENCE · MISSION LOG ===== -->
+  <section id="experiencia" class="section reveal">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="exp.eyebrow">Trayectoria</span>
+      <h2 class="section-title" data-i18n="exp.title" data-i18n-html>Experiencia <span class="accent">Profesional</span></h2>
+      <p class="section-desc" data-i18n="exp.desc">Bitácora de misiones — selecciona una estación para explorar cada etapa de mi trayectoria.</p>
     </div>
 
+    <div class="mlog">
+      <div class="mlog-rail" id="mlogRail">
+        <div class="rail-line"><span class="rail-fill" id="railFill"></span></div>
+        <div class="rail-stations" id="railStations"></div>
+      </div>
 
-    <div id="experiencia" class="py-12 px-8 lg:px-20">
-        <div class="text-center mb-12">
-            <h3 class="section-title gradient-title">Experiencia <span class="highlight">laboral</span></h3>
+      <div class="mlog-viewport bracket">
+        <div class="mlog-detail" id="mlogDetail">
+          <div class="ml-meta">
+            <span class="ml-code mono" id="mlCode">MISSION 04</span>
+            <span class="ml-date mono" id="mlDate"></span>
+          </div>
+          <h3 class="ml-company" id="mlCompany"></h3>
+          <p class="ml-role" id="mlRole"></p>
+          <p class="ml-desc" id="mlDesc"></p>
+          <div class="ml-tags" id="mlTags"></div>
         </div>
-        
-        <div class="experience-timeline">
-            <div class="experience-item">
-                <div class="experience-header">
-                    <div>
-                        <h4 class="experience-title">TECH ENERGY CONTROL S.A. DE C.V.</h4>
-                        <p class="experience-company">Desarrollador IA</p>
-                    </div>
-                    <span class="experience-date">Septiembre 2025 - Actualidad</span>
-                </div>
-                <p class="experience-description">
-                    Colaboración con áreas de negocio para la transformación digital de la empresa, presentando iniciativas, levantamiento de
-                    requerimientos y participación en la capacitación, diseño y desarrollo de aplicaciones para optimizar procesos mediante
-                    scripts, orquestación de flujos de trabajo con herramientas de IA generativa, integración de chatbots y agentes con Ollama,
-                    APIs externas (OpenAI), Gemini, Laravel, Python y n8n.
+      </div>
+    </div>
+  </section>
 
-                </p>
-                <p class="experience-description">
-                    Implementación y configuración de servidor on-premise para el despliegue de proyectos internos, utilizando Ubuntu Server
-                    con arquitectura Zero Trust y Cloudflare Tunnel bajo Nginx, con entrenamiento de modelos de IA a nivel local (reduciendo
-                    signficativamente el costos por consumo de tokens) e integración de flujos de trabajo con herramientas de orquestación
-                </p>
-                <p class="experience-description">
-                    Participación con el equipo de sistemas, realizando mantenimiento de equipos, instalación y configuración de hardware y
-                    software, soporte a usuarios, resolución de incidencias y administración de redes LAN/Wi-Fi, asegurando la disponibilidad y
-                    correcto funcionamiento de los servicios de TI.
-                </p>
-            </div>
-
-            <div class="experience-item">
-                <div class="experience-header">
-                    <div>
-                        <h4 class="experience-title">RADIOMÓVIL DIPSA, S.A. DE C.V.</h4>
-                        <p class="experience-company">Analista de Sistemas de Apreciación al Cliente CRM</p>
-                    </div>
-                    <span class="experience-date">Diciembre 2024 - Junio 2025</span>
-                </div>
-                <p class="experience-description">
-                    Encargado de soporte N1 y N2 al CRM en procesos criticos del departamento, apoyo en ventanas de mantenimiento, guardias
-                    post despliegue y capacitación de cedula externa para atención de incidencias.
-                </p>
-                <p class="experience-description">
-                    Documentación de procesos y actividades tecnicas dentro del departamento, esto permitio reducir la curva de aprendizaje
-                    del equipo, solucionar incidencias de forma eficiente y establecer una base de conocimiento.
-                </p>
-                <p class="experience-description">
-                    Análisis e implementación de mejoras de procesos batch desarrollados en Java, Springboot, con base de datos Oracle,
-                    validación de colas IBM MQ en ambientes QA, desarrollo y productivo, apoyo a migraciónes de base de datos y validación de
-                    servicios SOAP bajo servidores de aplicaciones WebSphere (WAS) utilizando IBM RAD.
-                </p>
-                <p class="experience-description">
-                    Asistente de PM, realice el seguimiento de proyectos, creación de minutas, reunion con equipos técnicos, asi como
-                    participación activa en sesiones.
-                </p>
-            </div>
-
-            <div class="experience-item">
-                <div class="experience-header">
-                    <div>
-                        <h4 class="experience-title">BH TRADEMARKET S.A DE C.V.</h4>
-                        <p class="experience-company">Desarrollador Web</p>
-                    </div>
-                    <span class="experience-date">Enero 2023 - Noviembre 2024</span>
-                </div>
-                <p class="experience-description">
-                    Gestión de proyectos, toma de requerimientos a clientes internos y externos, presentación de propuestas, avances y
-                    entregables
-                </p>
-                <p class="experience-description">
-                    Lider de desarrollo backend, analisis de requerimentos con el equipo, asignación de tareas, seguimiento, mentorías y
-                    resolución de incidencias. Se utilizaron herramientas y técncas como Scrum, Planning Poker, MoSCoW, Trello, Monday y planes
-                    de trabajo.
-                </p>
-                <p class="experience-description">
-                    Coordinación con equipos de diseño y marketing para el desarrollo de propuestas y productos finales.
-                </p>
-                <p class="experience-description">
-                    Desarrollador Fullstack, creación de plataformas e-Commerce B2B a la medida, para clientes externos con procesos de ventas
-                    a la medida, usando Laravel, MySQL, Tailwind, Javascript, desplegados en servidores VPS.
-                </p>
-                <p class="experience-description">
-                    Creación de aplicaciones móviles Android e iOS para clientes internos y externos, con despliegue en Google Play y App Store,
-                    utilizando Flutter y Swift, empleando herramientas como JWT, notificaciones push, Providers, llamadas asíncronas, servicios en
-                    segundo plano, manejo de estados, SQLite, SharedPreferences y acceso a hardware (NFC, cámara, almacenamiento interno)
-                </p>
-            </div>
-
-            <div class="experience-item">
-                <div class="experience-header">
-                    <div>
-                        <h4 class="experience-title">PROMO LIFE S. DE R.L. DE C.V</h4>
-                        <p class="experience-company">Becario de Desarrollo</p>
-                    </div>
-                    <span class="experience-date">Septiembre 2021 - Enero 2023</span>
-                </div>
-                <p class="experience-description">
-                    Desarrollo de proyectos web para clientes internos utilizando Laravel, MySQL, Bootstrap, Ajax, Jquery, Wordpress,
-                    Woocommerce y Javascript con despliegue en servidores VPS.
-                </p>
-                <p class="experience-description">
-                    Desarrollo de aplicaciones móviles de caracter interno utilizando frameworks como Flutter y herramientas de Firebase (Cloud
-                    Messaging,Analytics, Crashlitycs), cree APIs a nivel backend para la comunicación con sistemas web y despliegue en Google
-                    Play y App Store.
-                </p>
-                <p class="experience-description">
-                    Diseño de propuestas visuales para clientes, desarrolladas en Figma, involucrado desde la fase de requerimentos, hasta la
-                    creación de Wireframes, Mockups, Prototipos funcionales y Sistemas de Diseño.
-                </p>
-            </div>
-        </div>
+  <!-- ===== CERTS · CONSTELLATION ===== -->
+  <section id="certificaciones" class="section reveal">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="cert.eyebrow">Acreditaciones</span>
+      <h2 class="section-title" data-i18n="cert.title" data-i18n-html>Cursos y <span class="accent">Certificados</span></h2>
+      <p class="section-desc" data-i18n="cert.desc">Consola de proyección holográfica — selecciona un módulo para visualizar la credencial.</p>
     </div>
 
-
-
-    <div id="certificaciones" class="py-12 px-8 lg:px-20">
-        <div class="text-center mb-12">
-            <h3 class="section-title gradient-title">Cursos y <span class="highlight">Certificados</span></h3>
-        </div>
-        
-        <div class="certificates-grid">
-
-            <a href="https://www.credly.com/badges/96c105fa-d9a1-4d70-a98c-5c7d2ec20c14" target="_blank">
-                <div class="certificate-card">
-                    <div class="certificate-icon">
-                        <img src="./img/movil.png" alt="scrum" >
-                    </div>
-                    <h4 class="certificate-name">Desarrollo Móvil </h4>
-                    <p class="certificate-issuer">BEDU + Santander Universidades - 2021</p>
-                    <br>
-                </div>
+    <div class="holo-console bracket">
+      <div class="hc-head">
+        <span class="hc-dot"></span>
+        <span class="mono hc-title" data-i18n="cert.console">PROYECTOR DE CREDENCIALES</span>
+        <span class="mono hc-id" id="hcCount">06 MÓDULOS</span>
+      </div>
+      <div class="hc-body">
+        <div class="hc-stage" id="hcStage">
+          <div class="hc-grid"></div>
+          <div class="hc-beam"></div>
+          <div class="holo-card" id="holoCard">
+            <div class="holo-ico" id="holoIco"></div>
+            <div class="holo-year mono" id="holoYear"></div>
+            <h3 class="holo-name" id="holoName"></h3>
+            <div class="holo-issuer mono" id="holoIssuer"></div>
+            <a class="holo-verify" id="holoVerify" target="_blank" rel="noopener">
+              <span data-i18n="cert.verify">Verificar credencial</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
             </a>
-
-            <a href="https://www.credly.com/badges/c9211d10-e9b8-49e1-8069-24d362b0cb34/" target="_blank">
-                <div class="certificate-card">
-                    <div class="certificate-icon">
-                        <img src="./img/movil2.png" alt="scrum" >
-                    </div>
-                    <h4 class="certificate-name">Proyecto Ganador - Desarrollo Móvil</h4>
-                    <p class="certificate-issuer">BEDU + Santander Universidades - 2021</p>
-                </div>
-            </a>
-
-            
-            <a href="https://www.acreditta.com/credential/af60c343-56b1-4208-8d50-1a5f1797b5d6" target="_blank">
-                <div class="certificate-card">
-                    <div class="certificate-icon">
-                        <img src="./img/scrum.webp" alt="scrum" >
-                    </div>
-                    <h4 class="certificate-name">Scrum Master</h4>
-                    <p class="certificate-issuer">BEDU + Santander Universidades - 2023</p>
-                    <br>
-                </div>
-            </a>
-           
-            <a href="https://www.acreditta.com/credential/463c42e3-b961-4c19-8819-8fec8c2e2f70" target="_blank">
-                <div class="certificate-card">
-                    <div class="certificate-icon">
-                        <img src="./img/scrum2.webp" alt="scrum" >
-                    </div>
-                    <h4 class="certificate-name">Proyecto Ganador - Scrum Master</h4>
-                    <p class="certificate-issuer">BEDU + Santander Universidades - 2023</p>
-                </div>
-            </a>
-            
-            <a href="https://view.pok.tech/c/a95c0e92-07c9-42a6-a014-f90546ba228e3" target="_blank">
-                <div class="certificate-card">
-                    <div class="certificate-icon">
-                        <img src="./img/ia.png" alt="IA y Machine Learning" >
-                    </div>
-                    <h4 class="certificate-name">IA y Machine Learning</h4>
-                    <p class="certificate-issuer">BEDU + Santander Universidades - 2025</p>
-                </div>
-            </a>
-            
-            <a href="https://view.pok.tech/c/0f18fe43-acf3-4bf2-9b37-bc8711f6e5e1" target="_blank">
-                <div class="certificate-card">
-                    <div class="certificate-icon">
-                        <img src="./img/ia2.png" alt="IA y Machine Learning" >
-                    </div>
-                    <h4 class="certificate-name">Prototype - IA y Machine Learning</h4>
-                    <p class="certificate-issuer">BEDU + Santander Universidades - 2025</p>
-                </div>
-            </a>
-            
+            <div class="holo-scan"></div>
+          </div>
+          <div class="hc-base"></div>
         </div>
+        <div class="hc-selectors" id="hcSelectors"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== INFO · HOLO CARDS ===== -->
+  <section id="informacion" class="section reveal">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="info.eyebrow">Fuera del código</span>
+      <h2 class="section-title" data-i18n="info.title" data-i18n-html>Información <span class="accent">Adicional</span></h2>
+    </div>
+    <div class="info-grid">
+
+      <!-- Achievement HUD card -->
+      <article class="hcard tilt achv" data-stagger>
+        <div class="hcard-inner">
+          <div class="hcard-corner tl"></div><div class="hcard-corner br"></div>
+          <div class="achv-top">
+            <span class="achv-tag mono" data-i18n="i1.tag">LOGRO DESBLOQUEADO</span>
+            <span class="info-date mono" data-i18n="i1.date">Sep 2025</span>
+          </div>
+          <div class="achv-medal">
+            <span class="medal-ring"></span>
+            <span class="medal-ring r2"></span>
+            <span class="medal-core">2°</span>
+          </div>
+          <h4 data-i18n="i1.title">Walmart Code Ecosystem</h4>
+          <p data-i18n="i1.desc"></p>
+          <div class="achv-bar"><span style="width:88%"></span><em class="mono" data-i18n="i1.rank">TOP 2 · HACKATHON</em></div>
+        </div>
+      </article>
+
+      <!-- Terminal window card -->
+      <article class="hcard tilt term" data-stagger>
+        <div class="hcard-inner">
+          <div class="term-bar"><span class="tb-dot r"></span><span class="tb-dot y"></span><span class="tb-dot g"></span><span class="tb-name mono">oscar@arch:~</span></div>
+          <div class="term-body mono">
+            <div class="tl"><span class="pr">$</span> <span data-i18n="i2.cmd2">cat ~/.config/sobre_mi</span></div>
+            <div class="tl out"><span data-i18n="i2.desc"></span></div>
+            <div class="tl"><span class="pr">$</span> <span class="term-cursor">▋</span></div>
+          </div>
+        </div>
+      </article>
+
     </div>
 
-
-    <div id="informacion" class="py-12 px-8 lg:px-20">
-        <div class="text-center mb-12">
-            <h3 class="section-title gradient-title">Información adicional</h3>
+    <!-- Dyno Runner mini-game -->
+    <div class="dyno-game bracket" id="dynoGame">
+      <div class="dg-head">
+        <span class="mono dg-title"><span class="dg-dot"></span> DYNO RUNNER</span>
+        <div class="dg-scores mono">
+          <span><i data-i18n="game.score">PUNTOS</i> <b id="dgScore">0000</b></span>
+          <span><i data-i18n="game.best">RÉCORD</i> <b id="dgBest">0000</b></span>
         </div>
-        
-        <div class="info-cards">
-
-            <div class="info-card">
-                <div class="info-card-carousel">
-                    <div class="info-card-carousel-track">
-                        <img src="./img/walmart1.jpg" alt="Walmart Code Ecosystem 1" class="info-card-image">
-                        <img src="./img/walmart2.jpg" alt="Walmart Code Ecosystem 2" class="info-card-image">
-                        <img src="./img/walmart1.jpg" alt="Walmart Code Ecosystem 1" class="info-card-image">
-                        <img src="./img/walmart2.jpg" alt="Walmart Code Ecosystem 2" class="info-card-image">
-                    </div>
-                </div>
-                <div class="info-card-overlay">
-                    <div class="flex justify-between w-full mb-4">
-                        <h4 class="text-white text-xl font-semibold">Walmart Code Ecosystem</h4>
-                        <p class="text-white text-xs mt-2">10 Septiembre 2025</p>
-
-                    </div>
-                    <p class="info-card-description">Obtuvimos el segundo lugar en el #hackathon de Walmart, destacando el proyecto por el enfoque centrado en el usuario y diseño de la app presentada.</p>
-                </div>
-            </div>
-
-
-            <div class="info-card">
-                <div class="info-card-carousel">
-                    <div class="info-card-carousel-track track-seven">
-                        <img src="./img/linux1.jpg" alt="Personalización Linux 1" class="info-card-image">
-                        <img src="./img/linux2.jpg" alt="Personalización Linux 2" class="info-card-image">
-                        <img src="./img/linux3.jpg" alt="Personalización Linux 3" class="info-card-image">
-                        <img src="./img/linux4.jpg" alt="Personalización Linux 4" class="info-card-image">
-                        <img src="./img/linux5.jpg" alt="Personalización Linux 5" class="info-card-image">
-                        <img src="./img/linux6.jpg" alt="Personalización Linux 6" class="info-card-image">
-                        <img src="./img/linux7.jpg" alt="Personalización Linux 7" class="info-card-image">
-                        <img src="./img/linux1.jpg" alt="Personalización Linux 1" class="info-card-image">
-                    </div>
-                </div>
-                <div class="info-card-overlay">
-                    <div class="flex justify-between w-full mb-4">
-                        <h4 class="text-white text-xl font-semibold">Personalización GNU/Linux</h4>
-                        <p class="text-white text-xs mt-2"> 2016 - Actualidad</p>
-                    </div>
-                    <p class="info-card-description">Uno de mis hobbies es la personalización de entornos linux, el modificar completamente el sistema operativo, solucionar errores, crear interfaces armonicas y probar nuevas cosas.  </p>
-                </div>
-            </div>
+      </div>
+      <div class="dg-stage" id="dgStage" tabindex="0">
+        <canvas id="dgCanvas"></canvas>
+        <div class="dg-overlay" id="dgOverlay">
+          <p class="dg-msg" id="dgMsg" data-i18n="game.start">Pulsa ESPACIO para iniciar</p>
+          <p class="dg-sub mono" data-i18n="game.hint">DYNO RUNNER — pulsa ESPACIO o toca para saltar</p>
         </div>
+      </div>
     </div>
+  </section>
 
-
-    <div id="contacto" class="cta-section">
-        <div class="cta-content">
-            <h2 class="cta-title">¡Hagamos su proyecto realidad!</h2>
-            <p class="cta-description">
-                ¿Está interesado en colaborar o necesita un desarrollador para su próximo proyecto? ¡Estoy disponible para nuevas oportunidades!
-            </p>
-            <div class="contact-buttons">
-                <a href="mailto:oscar.chavez.devil@gmail.com" class="contact-btn email-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="4" width="20" height="16" rx="2"/>
-                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                    </svg>
-                    Email
-                </a>
-                <a href="https://wa.me/5565235522" target="_blank" class="contact-btn whatsapp-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                    </svg>
-                    WhatsApp
-                </a>
-                <a href="https://www.linkedin.com/in/oscar-chavez-rosales/" target="_blank" class="contact-btn linkedin-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                    </svg>
-                    LinkedIn
-                </a>
-            </div>
+  <!-- ===== CTA · WARP + TRANSMISSION ===== -->
+  <section id="contacto" class="cta-section reveal">
+    <canvas id="warpCanvas" aria-hidden="true"></canvas>
+    <div class="cta-rings" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <div class="cta-embers" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="cta-inner">
+      <div class="avail-chip mono"><span class="radar"></span><span data-i18n="cta.avail">DISPONIBLE PARA NUEVOS PROYECTOS</span></div>
+      <div class="transmission bracket" id="transmission">
+        <div class="tx-head">
+          <span class="tx-dot"></span>
+          <span class="mono" data-i18n="tx.head">TRANSMISIÓN ENTRANTE</span>
+          <span class="tx-status mono" data-i18n="tx.status">● EN VIVO</span>
         </div>
+        <div class="tx-body mono" id="txBody"></div>
+      </div>
+      <h2 class="cta-title glitch-text" data-i18n="cta.title">¿Tienes una idea? Construyámosla.</h2>
+      <p class="cta-desc" data-i18n="cta.desc"></p>
+      <div class="contact-row" id="magneticRow">
+        <a class="contact-btn email magnetic" href="mailto:oscar.chavez.dev@gmail.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <span>Email</span></a>
+        <a class="contact-btn wa magnetic" href="https://wa.me/5565235522" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          <span>WhatsApp</span></a>
+        <a class="contact-btn li magnetic" href="https://www.linkedin.com/in/oscar-chavez-rosales/" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          <span>LinkedIn</span></a>
+      </div>
     </div>
+  </section>
 
-    <script>
-        const menuToggle = document.getElementById('menuToggle');
-        const navMenu = document.getElementById('navMenu');
-        const navLinks = document.querySelectorAll('.nav-link');
+</main>
 
-        menuToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-            menuToggle.classList.toggle('active');
-        });
+<footer>
+  <span data-i18n="footer.text">Diseñado y codificado por Oscar Chávez Rosales</span> · <span class="accent">2026</span>
+</footer>
 
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.classList.remove('active');
-                menuToggle.classList.remove('active');
-            });
-        });
-    </script>
+<!-- ===== DYNO AI ASSISTANT ===== -->
+<button class="aria-fab" id="aria-fab" aria-label="Abrir Dyno AI">
+  <!-- Dyno: same geometry as game.js drawDino(), viewBox spans tail(-8) to snout(50) -->
+  <svg class="dyno-glyph" viewBox="-8 0 58 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- tail -->
+    <path d="M8 22 L-6 16 L8 30 Z" fill="currentColor"/>
+    <!-- body -->
+    <rect x="8" y="14" width="26" height="24" rx="6" fill="#1a1330" stroke="currentColor" stroke-width="2"/>
+    <!-- head -->
+    <rect x="24" y="2" width="20" height="18" rx="6" fill="#1a1330" stroke="currentColor" stroke-width="2"/>
+    <!-- snout -->
+    <rect x="40" y="9" width="8" height="9" rx="3" fill="#1a1330" stroke="currentColor" stroke-width="2"/>
+    <!-- dorsal fin (magenta) -->
+    <path d="M16 14 L20 6 L24 14 Z" fill="#ff2bd6"/>
+    <!-- eye -->
+    <circle cx="38" cy="9" r="2.6" fill="#eafcff"/>
+    <!-- legs -->
+    <line x1="16" y1="38" x2="12" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <line x1="26" y1="38" x2="30" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+</button>
+<div class="aria-panel" id="aria-panel">
+  <div class="aria-header">
+    <span class="aria-orb"><svg viewBox="-8 0 58 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 22 L-6 16 L8 30 Z" fill="#18e8ff"/>
+        <rect x="8" y="14" width="26" height="24" rx="6" fill="#05030a" stroke="#18e8ff" stroke-width="2"/>
+        <rect x="24" y="2" width="20" height="18" rx="6" fill="#05030a" stroke="#18e8ff" stroke-width="2"/>
+        <rect x="40" y="9" width="8" height="9" rx="3" fill="#05030a" stroke="#18e8ff" stroke-width="2"/>
+        <path d="M16 14 L20 6 L24 14 Z" fill="#ff2bd6"/>
+        <circle cx="38" cy="9" r="2.6" fill="#eafcff"/>
+        <line x1="16" y1="38" x2="12" y2="50" stroke="#18e8ff" stroke-width="3" stroke-linecap="round"/>
+        <line x1="26" y1="38" x2="30" y2="50" stroke="#18e8ff" stroke-width="3" stroke-linecap="round"/>
+      </svg></span>
+    <div class="who"><b>Dyno AI</b><small data-i18n="aria.sub">Dyno AI · en línea</small></div>
+    <button class="aria-close" id="aria-close" aria-label="close">✕</button>
+  </div>
+  <div class="aria-log" id="aria-log"></div>
+  <div class="aria-suggest">
+    <button data-i18n="aria.s1">¿Qué hace con IA?</button>
+    <button data-i18n="aria.s2">Su stack principal</button>
+    <button data-i18n="aria.s3">¿Cómo lo contacto?</button>
+  </div>
+  <div class="aria-input">
+    <input id="aria-input" type="text" data-i18n-ph="aria.placeholder" placeholder="Pregunta sobre Oscar…" />
+    <button id="aria-send" aria-label="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button>
+  </div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<script src="js/i18n.js"></script>
+<script>
+/* build tech marquees */
+(function () {
+  const C = '18e8ff';
+  const rows = [
+    [['html5','HTML5'],['css','CSS3'],['javascript','JavaScript'],['react','React'],['tailwindcss','Tailwind'],['bootstrap','Bootstrap'],['laravel','Laravel'],['flutter','Flutter']],
+    [['openjdk','Java'],['dart','Dart'],['php','PHP'],['python','Python'],['mysql','MySQL'],['','Oracle DB'],['kotlin','Kotlin'],['swift','Swift']],
+    [['linux','Linux'],['figma','Figma'],['anthropic','Claude'],['googlegemini','Gemini'],['ollama','Ollama'],['git','Git'],['github','GitHub'],['nodedotjs','Node.js'],['docker','Docker']]
+  ];
+  rows.forEach((row, i) => {
+    const el = document.getElementById('mq' + (i + 1));
+    if (!el) return;
+    const make = () => row.map(([slug, name]) =>
+      `<div class="chip">${slug ? `<img src="https://cdn.simpleicons.org/${slug}/${C}" alt="" onerror="this.style.display='none'"/>` : `<span style="width:26px;height:26px;display:grid;place-items:center;color:var(--cyan)">◈</span>`}<span>${name}</span></div>`
+    ).join('');
+    el.innerHTML = make() + make(); /* duplicate for seamless loop */
+  });
+})();
+</script>
+<script src="js/scene.js"></script>
+<script src="js/projects.js"></script>
+<script src="js/experience.js"></script>
+<script src="js/game.js"></script>
+<script src="js/certs.js"></script>
+<script src="js/cta.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/app.js"></script>
 
 </body>
 </html>
