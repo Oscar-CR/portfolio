@@ -302,7 +302,7 @@
         </div>
         <div class="tx-body mono" id="txBody"></div>
       </div>
-      <h2 class="cta-title glitch-text" data-i18n="cta.title">¡Hagamos realidad tu proyecto!</h2>
+      <h2 class="cta-title glitch-text" data-i18n="cta.title">¿Tienes una idea? Construyámosla.</h2>
       <p class="cta-desc" data-i18n="cta.desc"></p>
       <div class="contact-row" id="magneticRow">
         <a class="contact-btn email magnetic" href="mailto:oscar.chavez.dev@gmail.com">
@@ -326,11 +326,37 @@
 
 <!-- ===== DYNO AI ASSISTANT ===== -->
 <button class="aria-fab" id="aria-fab" aria-label="Abrir Dyno AI">
-  <svg class="dyno-glyph" viewBox="0 0 32 32" fill="none"><path d="M11 26v-4M21 26v-4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M8 22c-3 0-5-2-5-5 0-2 1-3 3-4 1-4 4-7 9-7 4 0 6 2 7 4 3 0 5 2 5 5 0 4-3 7-8 7H8Z" fill="currentColor"/><circle cx="22" cy="13" r="1.7" fill="#05030a"/><path d="M27 9l3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  <!-- Dyno: same geometry as game.js drawDino(), viewBox spans tail(-8) to snout(50) -->
+  <svg class="dyno-glyph" viewBox="-8 0 58 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- tail -->
+    <path d="M8 22 L-6 16 L8 30 Z" fill="currentColor"/>
+    <!-- body -->
+    <rect x="8" y="14" width="26" height="24" rx="6" fill="#1a1330" stroke="currentColor" stroke-width="2"/>
+    <!-- head -->
+    <rect x="24" y="2" width="20" height="18" rx="6" fill="#1a1330" stroke="currentColor" stroke-width="2"/>
+    <!-- snout -->
+    <rect x="40" y="9" width="8" height="9" rx="3" fill="#1a1330" stroke="currentColor" stroke-width="2"/>
+    <!-- dorsal fin (magenta) -->
+    <path d="M16 14 L20 6 L24 14 Z" fill="#ff2bd6"/>
+    <!-- eye -->
+    <circle cx="38" cy="9" r="2.6" fill="#eafcff"/>
+    <!-- legs -->
+    <line x1="16" y1="38" x2="12" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <line x1="26" y1="38" x2="30" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  </svg>
 </button>
 <div class="aria-panel" id="aria-panel">
   <div class="aria-header">
-    <span class="aria-orb"><svg viewBox="0 0 32 32" fill="none"><path d="M8 22c-3 0-5-2-5-5 0-2 1-3 3-4 1-4 4-7 9-7 4 0 6 2 7 4 3 0 5 2 5 5 0 4-3 7-8 7H8Z" fill="#05030a"/><circle cx="22" cy="13" r="1.6" fill="#18e8ff"/></svg></span>
+    <span class="aria-orb"><svg viewBox="-8 0 58 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 22 L-6 16 L8 30 Z" fill="#18e8ff"/>
+        <rect x="8" y="14" width="26" height="24" rx="6" fill="#05030a" stroke="#18e8ff" stroke-width="2"/>
+        <rect x="24" y="2" width="20" height="18" rx="6" fill="#05030a" stroke="#18e8ff" stroke-width="2"/>
+        <rect x="40" y="9" width="8" height="9" rx="3" fill="#05030a" stroke="#18e8ff" stroke-width="2"/>
+        <path d="M16 14 L20 6 L24 14 Z" fill="#ff2bd6"/>
+        <circle cx="38" cy="9" r="2.6" fill="#eafcff"/>
+        <line x1="16" y1="38" x2="12" y2="50" stroke="#18e8ff" stroke-width="3" stroke-linecap="round"/>
+        <line x1="26" y1="38" x2="30" y2="50" stroke="#18e8ff" stroke-width="3" stroke-linecap="round"/>
+      </svg></span>
     <div class="who"><b>Dyno AI</b><small data-i18n="aria.sub">Dyno AI · en línea</small></div>
     <button class="aria-close" id="aria-close" aria-label="close">✕</button>
   </div>

@@ -6,18 +6,18 @@
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const LINES = {
     es: [
-      '> Estableciendo enlace seguro…',
-      '> Escaneando oportunidades…',
-      '> Perfil: Desarrollador de Software + IA',
-      '> Estado: DISPONIBLE para nuevos proyectos',
-      '> ¿Construimos algo extraordinario?'
+      '> ¿Necesitas una app móvil para tu negocio?',
+      '> ¿Integrar sistemas de IA en tu organización?',
+      '> ¿Optimizar procesos con automatización?',
+      '> ¿Construir una aplicación web a medida?',
+      '> Hagamos realidad tu proyecto — JUNTOS.'
     ],
     en: [
-      '> Establishing secure link…',
-      '> Scanning opportunities…',
-      '> Profile: Software + AI Developer',
-      '> Status: AVAILABLE for new projects',
-      '> Shall we build something extraordinary?'
+      '> Need a mobile app for your business?',
+      '> Integrate AI systems into your organization?',
+      '> Optimize processes with automation?',
+      '> Build a custom web application?',
+      '> Let\'s bring your project to life — TOGETHER.'
     ]
   };
 

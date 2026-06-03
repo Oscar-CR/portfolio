@@ -1,7 +1,6 @@
 /* ============================================================
    game.js — "Dyno Runner": endless runner with the Dyno mascot.
-   Jump (Space / ArrowUp / tap) over obstacles themed on Oscar's
-   passions: metal note, game controller, dumbbell, concert ticket.
+   Jump (Space / ArrowUp / tap) over tech-stack icon obstacles.
    Score + best (localStorage). i18n labels.
    ============================================================ */
 (function () {
@@ -12,7 +11,7 @@
   let state = 'idle';            // idle | run | over
   let raf = null, last = 0;
   let score = 0, best = 0;
-  let speed = 0, baseSpeed = 360;
+  let speed = 0, baseSpeed = 420;
   let spawnT = 0, nextGap = 1.1;
   let groundY = 0;
   let stars = [];
@@ -63,17 +62,40 @@
 
   function pad(n) { return String(Math.floor(n)).padStart(4, '0'); }
 
-  // ---- obstacle types (passions) ----
-  const TYPES = ['note', 'pad', 'dumbbell', 'ticket'];
+  // ---- obstacle types: tech skill icons ----
+  const TECH_ICONS = [
+    'html5','css3','javascript','react','laravel','flutter',
+    'python','java','php','mysql','nodejs','figma',
+    'git','linux','swift','kotlin','dart','bootstrap',
+    'tailwind','claude','openai','ollama','gemini','github'
+  ];
+  // each icon always maps to the same glow color (consistent, like the skills chips)
+  const ICON_COLOR = {};
+  (function() {
+    const palette = [CYAN, VIO, MAG];
+    TECH_ICONS.forEach((s, i) => { ICON_COLOR[s] = palette[i % palette.length]; });
+  })();
+  const imgCache = {};
+  function getImg(slug) {
+    if (!imgCache[slug]) {
+      const img = new Image();
+      img.src = 'assets/icons/' + slug + '.svg';
+      imgCache[slug] = img;
+    }
+    return imgCache[slug];
+  }
+  // preload all
+  TECH_ICONS.forEach(getImg);
+
   function spawn() {
-    const type = TYPES[(Math.random() * TYPES.length) | 0];
+    const slug = TECH_ICONS[(Math.random() * TECH_ICONS.length) | 0];
     const big = Math.random() < 0.3;
-    const h = big ? 46 : 34, w = big ? 40 : 32;
-    obstacles.push({ x: W + 20, y: groundY - h, w, h, type });
+    const sz = big ? 44 : 34;
+    obstacles.push({ x: W + 20, y: groundY - sz, w: sz, h: sz, slug, glowColor: ICON_COLOR[slug] });
   }
 
   function update(dt) {
-    speed += dt * 7;
+    speed += dt * 10;
     score += dt * speed * 0.04;
     // dino physics
     dino.vy += 1900 * dt;
@@ -152,30 +174,26 @@
 
   function drawObstacle(o) {
     ctx.save();
-    ctx.translate(o.x, o.y);
-    const c = o.type === 'note' ? MAG : o.type === 'pad' ? CYAN : o.type === 'dumbbell' ? VIO : MAG;
-    ctx.strokeStyle = c; ctx.fillStyle = c; ctx.lineWidth = 2.4; ctx.shadowBlur = 12; ctx.shadowColor = c;
+    const c = o.glowColor;
     const w = o.w, h = o.h;
-    if (o.type === 'note') {
-      // metal double note
-      ctx.beginPath(); ctx.moveTo(w*0.3, 4); ctx.lineTo(w*0.3, h-8); ctx.moveTo(w*0.75, 0); ctx.lineTo(w*0.75, h-12); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(w*0.3, 4); ctx.lineTo(w*0.75, 0); ctx.stroke();
-      ctx.beginPath(); ctx.arc(w*0.22, h-8, 6, 0, 7); ctx.fill();
-      ctx.beginPath(); ctx.arc(w*0.67, h-12, 6, 0, 7); ctx.fill();
-    } else if (o.type === 'pad') {
-      // game controller
-      rr(2, h*0.3, w-4, h*0.5, 8, false, true);
-      ctx.beginPath(); ctx.moveTo(w*0.5-4, h*0.55); ctx.lineTo(w*0.5+4, h*0.55); ctx.moveTo(w*0.5, h*0.55-4); ctx.lineTo(w*0.5, h*0.55+4); ctx.stroke();
-      ctx.beginPath(); ctx.arc(w-10, h*0.5, 2.4, 0, 7); ctx.fill();
-    } else if (o.type === 'dumbbell') {
-      // dumbbell
-      ctx.beginPath(); ctx.moveTo(8, h/2); ctx.lineTo(w-8, h/2); ctx.lineWidth = 4; ctx.stroke();
-      rr(2, h/2-9, 7, 18, 2, true, true); rr(w-9, h/2-9, 7, 18, 2, true, true);
+    // dark panel background
+    ctx.shadowBlur = 18; ctx.shadowColor = c;
+    ctx.fillStyle = 'rgba(5,3,10,0.65)';
+    rr(o.x, o.y, w, h, 7, true, false);
+    // glowing border
+    ctx.strokeStyle = c; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.8;
+    rr(o.x, o.y, w, h, 7, false, true);
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    // icon image
+    const img = imgCache[o.slug];
+    if (img && img.complete && img.naturalWidth > 0) {
+      const pad = 5;
+      ctx.drawImage(img, o.x + pad, o.y + pad, w - pad * 2, h - pad * 2);
     } else {
-      // concert ticket
-      rr(2, 6, w-4, h-12, 4, false, true);
-      ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(w*0.66, 6); ctx.lineTo(w*0.66, h-6); ctx.stroke(); ctx.setLineDash([]);
-      ctx.beginPath(); ctx.arc(w*0.32, h/2, 3, 0, 7); ctx.fill();
+      // fallback while loading
+      ctx.fillStyle = c; ctx.globalAlpha = 0.5;
+      rr(o.x + 6, o.y + 6, w - 12, h - 12, 4, true, false);
+      ctx.globalAlpha = 1;
     }
     ctx.restore(); ctx.shadowBlur = 0;
   }

@@ -140,13 +140,13 @@ window.I18N = {
                 en: "I've deeply customized Linux environments since 2016: fixing bugs and crafting harmonious interfaces. The same obsession with detail I bring to every project." },
 
   // contact
-  "cta.title": { es: "¡Hagamos realidad tu proyecto!", en: "Let's build your project!" },
+  "cta.title": { es: "¿Tienes una idea? Construyámosla.", en: "Got an idea? Let's build it." },
   "cta.eyebrow": { es: "Disponible para proyectos", en: "Available for projects" },
   "cta.avail": { es: "DISPONIBLE PARA NUEVOS PROYECTOS", en: "AVAILABLE FOR NEW PROJECTS" },
   "tx.head": { es: "TRANSMISIÓN ENTRANTE", en: "INCOMING TRANSMISSION" },
   "tx.status": { es: "● EN VIVO", en: "● LIVE" },
-  "cta.desc":  { es: "¿Buscas un desarrollador para tu próximo proyecto o quieres colaborar? Estoy disponible para nuevas oportunidades.",
-                 en: "Looking for a developer for your next project or want to collaborate? I'm open to new opportunities." },
+  "cta.desc":  { es: "Apps móviles, sistemas con IA, automatización de procesos, aplicaciones web — convierto ideas en productos reales. ¡Hablemos!",
+                 en: "Mobile apps, AI-powered systems, process automation, web applications — I turn ideas into real products. Let's talk." },
   "footer.text": { es: "Diseñado y codificado por Oscar Chávez Rosales", en: "Designed & coded by Oscar Chávez Rosales" },
 
   // ARIA assistant
