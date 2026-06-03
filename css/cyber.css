@@ -618,7 +618,7 @@ footer .accent { color: var(--cyan); }
 .aria-log::-webkit-scrollbar-thumb { background: var(--cyan-dim); border-radius: 4px; }
 .msg { max-width: 88%; padding: 11px 14px; border-radius: 12px; font-size: 0.9rem; line-height: 1.5; }
 .msg.user { align-self: flex-end; background: linear-gradient(100deg, var(--magenta), var(--violet)); color: #fff; border-bottom-right-radius: 3px; }
-.msg.bot { align-self: flex-start; background: var(--glass); border: 1px solid var(--line); color: var(--text); border-bottom-left-radius: 3px; }
+.msg.bot { align-self: flex-start; background: var(--glass); border: 1px solid var(--line); color: var(--text); border-bottom-left-radius: 3px; white-space: pre-line; }
 .msg.bot.typing { color: var(--cyan); font-family: var(--ff-mono); font-size: 0.82rem; }
 .aria-suggest { display: flex; flex-wrap: wrap; gap: 7px; padding: 0 18px 12px; }
 .aria-suggest button { font-family: var(--ff-mono); font-size: 0.7rem; padding: 6px 11px; border-radius: 16px; background: rgba(24,232,255,0.07); border: 1px solid var(--line-cyan); color: var(--cyan); cursor: pointer; transition: all .2s; }

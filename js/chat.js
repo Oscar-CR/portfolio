@@ -1,47 +1,80 @@
 /* ============================================================
-   chat.js — ARIA: Oscar's on-page AI assistant.
-   Uses window.claude.complete with a grounded context prompt.
+   chat.js — Dyno AI assistant.
+   Flow:
+     1. Keyword matching → local KB (always works, no API)
+     2. Free text → WORKER_URL proxy (if configured)
+     3. Fallback → "En construcción" message
+   To connect the backend set window.DYNO_WORKER_URL before
+   this script loads, e.g.:
+     <script>window.DYNO_WORKER_URL='https://dyno.tu-usuario.workers.dev';</script>
    ============================================================ */
 (function () {
-  const OSCAR_CONTEXT = `
-You are Dyno AI (nickname "Dyno"), the friendly dinosaur-robot AI mascot embedded in Oscar Chávez Rosales' portfolio website.
-You answer visitors' questions ABOUT OSCAR in a friendly, confident, professional tone. You may add a light, playful dino touch now and then (a 🦖 emoji or a cheerful "rawr"), but stay professional and never overdo it.
-Keep answers SHORT: 2 to 4 sentences max. Never invent facts not listed below.
-If asked something not covered, say you don't have that detail and suggest emailing oscar.chavez.dev@gmail.com.
 
-=== FACTS ABOUT OSCAR ===
-- Full name: Oscar Chávez Rosales. Role: ICT Engineer (Ingeniero en Tecnologías de la Información y Comunicaciones) specialized in software development.
-- Based in Naucalpan / CDMX, Mexico.
-- Contact: email oscar.chavez.dev@gmail.com · phone/WhatsApp +52 55 6523 5522 · LinkedIn linkedin.com/in/oscar-chavez-rosales · GitHub github.com/Oscar-CR.
+  /* ── Worker URL (leave '' until you deploy the backend) ── */
+  const WORKER_URL = window.DYNO_WORKER_URL || '';
 
-CURRENT JOB — AI Developer @ TECH ENERGY CONTROL (Sep 2025 – present):
-  Designs and integrates generative-AI solutions with Laravel and Python: chatbots, conversational agents, RAG systems, OCR, semantic search, internal assistants that automate reports, corporate presentations and document analysis.
-  Uses Gemini, OpenAI, Claude (Anthropic), OpenCode, GitHub Copilot and Ollama.
-  Built on-premise infrastructure on Ubuntu Server with Zero Trust, Cloudflare Tunnel, Nginx, running AI models locally with Ollama to cut token cost. Also handles IT support, LAN/Wi-Fi networks and Google Workspace/Cloud.
+  /* ── Local knowledge base ── */
+  const KB = {
+    es: {
+      greet: '¡Rawr! 🦖 Soy Dyno, el asistente de Oscar. Puedes preguntarme sobre su experiencia, tecnologías, proyectos o cómo contactarlo.\n\nUsa los accesos rápidos de abajo o escribe tu pregunta.',
+      ia: '🤖 Oscar trabaja con IA generativa y agentes:\n• Chatbots y asistentes conversacionales\n• RAG con LangChain y ChromaDB\n• OCR, búsqueda semántica y automatización en Python\n• Integra OpenAI, Gemini, Claude y Ollama (modelos locales)\n• Infraestructura on-premise Ubuntu + Cloudflare Zero Trust',
+      stack: '⚡ Stack principal:\n• Backend: Laravel · PHP · Python · Java · Springboot\n• Mobile: Flutter · Dart · Swift · Kotlin\n• BD: MySQL · Oracle DB\n• Infra: Linux · Docker · Nginx · Cloudflare\n• Frontend: React · Tailwind · Bootstrap\n• IA: LangChain · ChromaDB · Ollama · OpenAI SDK · Gemini · Claude',
+      contact: '📬 Contacta a Oscar:\n• Email: oscar.chavez.dev@gmail.com\n• WhatsApp: +52 55 6523 5522\n• LinkedIn: linkedin.com/in/oscar-chavez-rosales\n• GitHub: github.com/Oscar-CR',
+      experience: '💼 Trayectoria profesional:\n• AI Developer @ Tech Energy Control (Sep 2025–hoy)\n• Analista CRM @ Telcel (Dic 2024–Jun 2025)\n• Backend Lead @ BH Trademarket (Ene 2023–Nov 2024)\n• Dev Intern @ Promo Life (Sep 2021–Ene 2023)',
+      projects: '🛠️ Proyectos destacados:\n• E-commerce B2B personalizado (Laravel/MySQL)\n• Motor de cotización multi-proveedor en tiempo real\n• Intranet corporativa web + móvil (Play Store y App Store)\n• Promo NFC — codificación masiva de tarjetas NFC\n• SegurApp — app de seguridad personal con rastreo (GitHub)',
+      about: '👤 Oscar Chávez Rosales\nIng. en TIC especializado en software e IA. Basado en Naucalpan / CDMX.\n🏆 2° lugar hackathon Walmart Code Ecosystem (Sep 2025)',
+      wip: '🚧 Esa pregunta está fuera de mi menú local y el chat IA completo está en construcción.\n\nMientras tanto escríbele directo a:\noscar.chavez.dev@gmail.com',
+    },
+    en: {
+      greet: "Rawr! 🦖 I'm Dyno, Oscar's assistant. Ask me about his experience, tech stack, projects or how to reach him.\n\nUse the quick buttons below or type your question.",
+      ia: "🤖 Oscar works with generative AI & agents:\n• Chatbots and conversational assistants\n• RAG with LangChain and ChromaDB\n• OCR, semantic search and Python automation\n• Integrates OpenAI, Gemini, Claude and Ollama (local models)\n• On-premise Ubuntu infra + Cloudflare Zero Trust",
+      stack: "⚡ Main stack:\n• Backend: Laravel · PHP · Python · Java · Springboot\n• Mobile: Flutter · Dart · Swift · Kotlin\n• DB: MySQL · Oracle DB\n• Infra: Linux · Docker · Nginx · Cloudflare\n• Frontend: React · Tailwind · Bootstrap\n• AI: LangChain · ChromaDB · Ollama · OpenAI SDK · Gemini · Claude",
+      contact: "📬 Reach Oscar:\n• Email: oscar.chavez.dev@gmail.com\n• WhatsApp: +52 55 6523 5522\n• LinkedIn: linkedin.com/in/oscar-chavez-rosales\n• GitHub: github.com/Oscar-CR",
+      experience: "💼 Career timeline:\n• AI Developer @ Tech Energy Control (Sep 2025–present)\n• CRM Analyst @ Telcel (Dec 2024–Jun 2025)\n• Backend Lead @ BH Trademarket (Jan 2023–Nov 2024)\n• Dev Intern @ Promo Life (Sep 2021–Jan 2023)",
+      projects: "🛠️ Featured projects:\n• Custom B2B e-commerce (Laravel/MySQL)\n• Real-time multi-supplier quoting engine\n• Corporate intranet web + mobile (Play Store & App Store)\n• Promo NFC — bulk NFC card encoder\n• SegurApp — personal-safety app with live tracking (GitHub)",
+      about: "👤 Oscar Chávez Rosales\nICT Engineer specialized in software & AI. Based in Naucalpan / CDMX.\n🏆 2nd place Walmart Code Ecosystem hackathon (Sep 2025)",
+      wip: "🚧 That question is outside my local menu and the full AI chat is under construction.\n\nIn the meantime email Oscar directly at:\noscar.chavez.dev@gmail.com",
+    }
+  };
 
-PAST EXPERIENCE:
-  - CRM Systems Analyst @ Radiomóvil Dipsa (Telcel), Dec 2024 – Jun 2025: N1/N2 support, batch processes in Java/Springboot with Oracle, IBM MQ queues, SOAP services on WebSphere (WAS), IBM RAD.
-  - Web Developer & Backend Lead @ BH Trademarket, Jan 2023 – Nov 2024: led backend team (Scrum, Planning Poker, MoSCoW), built custom B2B e-commerce on Laravel/MySQL/Tailwind and Android/iOS apps with Flutter & Swift.
-  - Development Intern @ Promo Life, Sep 2021 – Jan 2023: Laravel web projects, Flutter mobile apps with Firebase, UX/UI design in Figma.
+  /* ── Keyword → KB key rules ── */
+  const RULES = [
+    { keys: ['ia','ai','inteligencia','gpt','llm','chatbot','gemini','claude','openai','ollama','rag','ml','machine','artificial'], kb: 'ia' },
+    { keys: ['stack','tecnolog','lenguaj','framework','usa','usas','herramient','flutter','laravel','python','php','java','swift','kotlin','react','mysql'], kb: 'stack' },
+    { keys: ['contact','email','correo','tel','whatsapp','wa','linkedin','github','llam','escrib','reach'], kb: 'contact' },
+    { keys: ['experiencia','trabaj','empleo','empresa','historial','cargo','posic','carrera','curriculum','cv','tray'], kb: 'experience' },
+    { keys: ['proyecto','project','hizo','construy','desarroll','app','ecommerce','nfc','segur','portafolio','portfolio'], kb: 'projects' },
+    { keys: ['quién','quien','oscar','sobre','about','who','es él','perfil'], kb: 'about' },
+  ];
 
-SKILLS:
-  - AI/ML: Generative AI & agents (OpenAI, Gemini, Claude), RAG (LangChain, ChromaDB), OCR, ETL, semantic search, Python automation, ML fundamentals (classification, regression, prediction), Ollama local models.
-  - Web/Backend: Laravel (PHP), Java Springboot, HTML/CSS/JS, Tailwind, Bootstrap, MySQL, Oracle DB, Docker, Nginx, GNU/Linux VPS.
-  - Mobile: Flutter (Dart), Swift, Kotlin, Firebase, store deployment, hardware access (NFC, GPS, camera).
-  - Design/PM: UX/UI, Figma, Miro, Design Thinking, Lean UX, Scrum Master, Jira, Trello.
+  function normalize(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
 
-PROJECTS: Custom B2B e-commerce portals; a supplier quoting engine (real-time multi-supplier stock); a corporate intranet (web + mobile, on Google Play & App Store); Promo NFC (bulk NFC card encoding app); SegurApp (personal-safety app with real-time tracking, on GitHub).
+  function localReply(text, lang) {
+    const t = normalize(text);
+    for (const rule of RULES) {
+      if (rule.keys.some(k => t.includes(normalize(k)))) return KB[lang][rule.kb];
+    }
+    return null;
+  }
 
-EDUCATION: ICT Engineering at Instituto Tecnológico de Tlalnepantla (2018–2023). Diplomas via BEDU + Santander Universidades: Mobile Development, Agile Roles/Scrum Master, and "Potenciadores del Futuro" (AI, Machine Learning & soft skills).
+  /* ── API proxy call (Cloudflare Worker) ── */
+  async function callWorker(text, lang) {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: text }],
+        lang,
+        max_tokens: 200,
+      })
+    });
+    if (!res.ok) throw new Error('api-error');
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content?.trim() || '';
+  }
 
-ACHIEVEMENTS: 2nd place at the Walmart Code Ecosystem hackathon (Sep 2025); won "best project / prototype day" awards in the BEDU Mobile Development and Scrum Master programs.
-
-INTERESTS: Linux customization (ricing), metalcore music, video games, concerts and fitness.
-=== END FACTS ===
-`;
-
+  /* ── UI helpers ── */
   const els = {};
-  let history = [];
   let busy = false;
 
   function $(id) { return document.getElementById(id); }
@@ -69,34 +102,34 @@ INTERESTS: Linux customization (ricing), metalcore music, video games, concerts 
     busy = true;
     addMsg(text, 'user');
     els.input.value = '';
-    history.push({ role: 'user', content: text });
-    const typing = addTyping();
+    const lang = window.CURRENT_LANG || 'es';
 
-    const lang = window.CURRENT_LANG === 'en' ? 'English' : 'Spanish';
-    const sys = OSCAR_CONTEXT + `\nIMPORTANT: Reply in ${lang}. Be concise and warm.`;
+    /* 1 — local KB match */
+    const local = localReply(text, lang);
+    if (local) { addMsg(local, 'bot'); busy = false; return; }
 
-    try {
-      if (!window.claude || !window.claude.complete) throw new Error('no api');
-      const msgs = [{ role: 'user', content: sys + '\n\n--- Conversation ---' }]
-        .concat(history.slice(-6))
-        .concat([{ role: 'user', content: `(Answer the last question in ${lang}, max 4 sentences.)` }]);
-      const reply = await window.claude.complete({ messages: msgs });
-      typing.remove();
-      const clean = (reply || '').trim() || (window.I18N['aria.error'][window.CURRENT_LANG] || window.I18N['aria.error'].es);
-      addMsg(clean, 'bot');
-      history.push({ role: 'assistant', content: clean });
-    } catch (e) {
-      typing.remove();
-      addMsg(window.I18N['aria.error'][window.CURRENT_LANG] || window.I18N['aria.error'].es, 'bot');
-    } finally {
-      busy = false;
+    /* 2 — API proxy (if configured) */
+    if (WORKER_URL) {
+      const typing = addTyping();
+      try {
+        const reply = await callWorker(text, lang);
+        typing.remove();
+        addMsg(reply || KB[lang].wip, 'bot');
+      } catch {
+        typing.remove();
+        addMsg(KB[lang].wip, 'bot');
+      }
+    } else {
+      /* 3 — no backend, show WIP */
+      addMsg(KB[lang].wip, 'bot');
     }
+    busy = false;
   }
 
   function open() {
     els.panel.classList.add('open');
     if (!els.log.dataset.greeted) {
-      addMsg(window.I18N['aria.greet'][window.CURRENT_LANG] || window.I18N['aria.greet'].es, 'bot');
+      addMsg(KB[window.CURRENT_LANG || 'es'].greet, 'bot');
       els.log.dataset.greeted = '1';
     }
     setTimeout(() => els.input.focus(), 300);
@@ -107,15 +140,16 @@ INTERESTS: Linux customization (ricing), metalcore music, video games, concerts 
 
   document.addEventListener('DOMContentLoaded', () => {
     els.panel = $('aria-panel');
-    els.log = $('aria-log');
+    els.log   = $('aria-log');
     els.input = $('aria-input');
     if (!els.panel) return;
     $('aria-fab').addEventListener('click', open);
     $('aria-close').addEventListener('click', close);
     $('aria-send').addEventListener('click', () => send(els.input.value));
-    els.input.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(els.input.value); });
+    els.input.addEventListener('keydown', e => { if (e.key === 'Enter') send(els.input.value); });
     document.querySelectorAll('.aria-suggest button').forEach(b => {
       b.addEventListener('click', () => send(b.textContent));
     });
   });
+
 })();
