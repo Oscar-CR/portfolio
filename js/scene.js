@@ -409,26 +409,131 @@
       }
     };
 
+    // ---- click interaction: quick "happy" reaction + greeting bubble ----
+    let cheerUntil = 0;
+    let cheerLevel = 0;
+    let popTimer = null;
+    const stage = canvas.parentElement;
+    const heroMouse = { x: 0, y: 0, tx: 0, ty: 0 };
+    const raycaster = new THREE.Raycaster();
+    const pointerNdc = new THREE.Vector2(10, 10);
+    let pointerInside = false;
+    let dinoHover = false;
+
+    function getHoverHintText() {
+      return (window.CURRENT_LANG || 'es') === 'en' ? 'Click Dyno' : 'Haz clic en Dyno';
+    }
+
+    function setHoverState(on) {
+      if (dinoHover === on) return;
+      dinoHover = on;
+      canvas.style.cursor = on ? 'pointer' : 'default';
+      if (stage) {
+        stage.dataset.dynoHint = getHoverHintText();
+        stage.classList.toggle('is-dyno-hover', on);
+      }
+    }
+
+    function updateRayPointer(e) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      pointerNdc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      pointerNdc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    }
+
+    function updateHeroPointerTargets(e) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      // Track globally: map pointer position relative to hero canvas, even when cursor is outside it.
+      heroMouse.tx = THREE.MathUtils.clamp(((e.clientX - rect.left) / rect.width) * 2 - 1, -1.2, 1.2);
+      heroMouse.ty = THREE.MathUtils.clamp(((e.clientY - rect.top) / rect.height) * 2 - 1, -1.2, 1.2);
+    }
+
+    function updateHoverHit() {
+      if (!pointerInside) { setHoverState(false); return false; }
+      raycaster.setFromCamera(pointerNdc, camera);
+      const hits = raycaster.intersectObjects(robot.children, true);
+      const hit = hits.length > 0;
+      setHoverState(hit);
+      return hit;
+    }
+
+    function sayHi() {
+      if (!stage) return;
+      let bubble = stage.querySelector('.hero-dyno-pop');
+      if (!bubble) {
+        bubble = document.createElement('div');
+        bubble.className = 'hero-dyno-pop';
+        stage.appendChild(bubble);
+      }
+      bubble.textContent = (window.CURRENT_LANG || 'es') === 'en' ? 'Rawr! Hi!' : 'Rawr! Hola!';
+      bubble.classList.remove('show');
+      void bubble.offsetWidth; // retrigger css animation
+      bubble.classList.add('show');
+      if (popTimer) clearTimeout(popTimer);
+      popTimer = setTimeout(() => bubble.classList.remove('show'), 1200);
+    }
+    canvas.addEventListener('pointermove', (e) => {
+      pointerInside = true;
+      updateRayPointer(e);
+      updateHeroPointerTargets(e);
+      updateHoverHit();
+    });
+    canvas.addEventListener('pointerenter', (e) => {
+      pointerInside = true;
+      updateRayPointer(e);
+      updateHeroPointerTargets(e);
+      updateHoverHit();
+    });
+    canvas.addEventListener('pointerleave', () => {
+      pointerInside = false;
+      setHoverState(false);
+    });
+    canvas.addEventListener('pointerdown', (e) => {
+      updateRayPointer(e);
+      updateHeroPointerTargets(e);
+      if (!updateHoverHit()) return;
+      cheerUntil = performance.now() + 1300;
+      sayHi();
+    });
+    // Keep look tracking active even when pointer moves outside hero canvas.
+    window.addEventListener('pointermove', updateHeroPointerTargets);
+
     const clock = new THREE.Clock();
     function frame() {
       const t = clock.getElapsedTime();
+      const now = performance.now();
+      const cheerTarget = now < cheerUntil ? 1 : 0;
+      cheerLevel += (cheerTarget - cheerLevel) * 0.14;
+      if (pointerInside) updateHoverHit();
       // robot idle hover + look
-      mouse.x += (mouse.tx - mouse.x) * 0.05;
-      mouse.y += (mouse.ty - mouse.y) * 0.05;
-      robot.position.y = -0.2 + Math.sin(t * 1.3) * 0.16;
-      robot.rotation.y = -0.58 + mouse.x * 0.5 + Math.sin(t*0.4)*0.1;
-      robot.rotation.x = mouse.y * 0.18;
-      head.rotation.z = Math.sin(t*0.8) * 0.05;
-      head.rotation.x = Math.sin(t*0.6) * 0.04;
+      heroMouse.x += (heroMouse.tx - heroMouse.x) * 0.08;
+      heroMouse.y += (heroMouse.ty - heroMouse.y) * 0.08;
+      const lookX = THREE.MathUtils.clamp(heroMouse.x, -0.95, 0.95);
+      const lookY = THREE.MathUtils.clamp(-heroMouse.y, -0.95, 0.95);
+      robot.position.y = -0.2 + Math.sin(t * 1.3) * 0.16 + Math.sin(t * 8.2) * 0.03 * cheerLevel;
+      // Keep a slight hero angle, but allow subtle tracking so it does not stare to one side.
+      robot.rotation.y = -0.08 + lookX * 0.32 + Math.sin(t * 0.4) * 0.06;
+      robot.rotation.x = lookY * 0.08;
+      robot.rotation.z = Math.sin(t * 7.4) * 0.03 * cheerLevel;
+      neck.rotation.y = lookX * 0.18;
+      neck.rotation.x = -lookY * 0.12;
+      head.rotation.y = lookX * 0.45;
+      head.rotation.x = -lookY * 0.24 + Math.sin(t * 0.6) * 0.03;
+      head.rotation.z = Math.sin(t * 0.8) * 0.04 + Math.sin(t * 9.5) * 0.07 * cheerLevel;
       // tail sway + fin shimmer
-      tail.rotation.y = Math.sin(t * 1.6) * 0.18;
+      tail.rotation.y = Math.sin(t * 1.6) * 0.18 + Math.sin(t * 10.5) * 0.12 * cheerLevel;
       tail.rotation.x = Math.sin(t * 1.2) * 0.06;
       fins.forEach((f, i) => f.scale.setScalar(1 + Math.sin(t * 2 + i * 0.6) * 0.08));
       // blink-ish eye pulse
       const ep = 0.7 + Math.sin(t*3)*0.3;
-      eyeL.scale.y = ep; eyeR.scale.y = ep;
+      eyeL.scale.y = ep * (1 - cheerLevel * 0.22);
+      eyeR.scale.y = ep * (1 - cheerLevel * 0.22);
+      eyeL.scale.x = 1 + cheerLevel * 0.12;
+      eyeR.scale.x = 1 + cheerLevel * 0.12;
       reactorRing.rotation.z += 0.02;
-      antTip.scale.setScalar(1 + Math.sin(t*4)*0.15);
+      antTip.scale.setScalar(1 + Math.sin(t*4)*0.15 + cheerLevel * 0.2);
+      reactorLight.intensity = 1.6 + cheerLevel * 0.9;
 
       // rings
       ring1.rotation.z += 0.004; ring2.rotation.z -= 0.005;
