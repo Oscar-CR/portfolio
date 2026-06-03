@@ -5,13 +5,13 @@
    ============================================================ */
 (function () {
   const JOBS = [
-    { company: 'TECH ENERGY CONTROL', code: 'MISSION 04 · NOW', role: 'e1.role', date: 'e1.date', desc: 'e1.desc',
+    { company: 'TECH ENERGY CONTROL', code: 'ETAPA 04 · ACTUAL', role: 'e1.role', date: 'e1.date', desc: 'e1.desc',
       tags: ['IA Generativa', 'RAG', 'Python', 'On-premise'], ai: true },
-    { company: 'RADIOMÓVIL DIPSA · Telcel', code: 'MISSION 03', role: 'e2.role', date: 'e2.date', desc: 'e2.desc',
+    { company: 'RADIOMÓVIL DIPSA · Telcel', code: 'ETAPA 03', role: 'e2.role', date: 'e2.date', desc: 'e2.desc',
       tags: ['Java', 'Oracle', 'IBM MQ', 'WebSphere'] },
-    { company: 'BH TRADEMARKET', code: 'MISSION 02', role: 'e3.role', date: 'e3.date', desc: 'e3.desc',
+    { company: 'BH TRADEMARKET', code: 'ETAPA 02', role: 'e3.role', date: 'e3.date', desc: 'e3.desc',
       tags: ['Laravel', 'Flutter', 'Swift', 'Scrum'] },
-    { company: 'PROMO LIFE', code: 'MISSION 01', role: 'e4.role', date: 'e4.date', desc: 'e4.desc',
+    { company: 'PROMO LIFE', code: 'ETAPA 01', role: 'e4.role', date: 'e4.date', desc: 'e4.desc',
       tags: ['Laravel', 'Firebase', 'Figma', 'WordPress'] }
   ];
 

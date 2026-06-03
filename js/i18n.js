@@ -18,7 +18,7 @@ window.I18N = {
   "hero.role":  { es: 'Ingeniero en TIC especializado en <span class="hl">desarrollo de software</span> e integración estratégica de <span class="hl">IA</span>.',
                   en: 'ICT Engineer specialized in <span class="hl">software development</span> and strategic <span class="hl">AI</span> integration.' },
   "hero.cta1":  { es: "Descargar CV",  en: "Download CV" },
-  "hero.cta2":  { es: "Habla con Dyno AI · mi asistente", en: "Talk to Dyno AI · my assistant" },
+  "hero.cta2":  { es: "Asistente de perfil", en: "Profile assistant" },
   "hero.scroll":{ es: "Desplaza",      en: "Scroll" },
 
   // skills
@@ -43,7 +43,7 @@ window.I18N = {
   // projects
   "proj.eyebrow": { es: "Trabajo seleccionado", en: "Selected work" },
   "proj.title":   { es: 'Proyectos <span class="accent">Destacados</span>', en: 'Featured <span class="accent">Projects</span>' },
-  "proj.desc":    { es: 'Centro de mando: explora <b>17 sistemas</b> que he construido — de portales B2B y apps en tiendas, a plataformas de IA on-premise.', en: 'Command center: explore <b>17 systems</b> I\u2019ve built — from B2B portals and store-published apps to on-premise AI platforms.' },
+  "proj.desc":    { es: 'Explora <b>17 proyectos</b> que he desarrollado: desde portales B2B y apps publicadas en tiendas, hasta soluciones de IA on-premise.', en: 'Explore <b>17 projects</b> I have delivered: from B2B portals and store-published apps to on-premise AI solutions.' },
   "cat.todos":    { es: "Todos", en: "All" },
   "cat.ia":       { es: "IA", en: "AI" },
   "cat.movil":    { es: "Móvil", en: "Mobile" },
@@ -85,7 +85,7 @@ window.I18N = {
   // experience
   "exp.eyebrow": { es: "Trayectoria", en: "Career" },
   "exp.title":   { es: 'Experiencia <span class="accent">Profesional</span>', en: 'Professional <span class="accent">Experience</span>' },
-  "exp.desc":    { es: 'Bitácora de misiones — selecciona una estación para explorar cada etapa de mi trayectoria.', en: 'Mission log — select a station to explore each stage of my journey.' },
+  "exp.desc":    { es: 'Selecciona una etapa para revisar mi experiencia, responsabilidades y logros en cada posición.', en: 'Select a stage to review my experience, responsibilities and outcomes in each role.' },
 
   "e1.role": { es: "Desarrollador IA", en: "AI Developer" },
   "e1.date": { es: "Sep 2025 — Actualidad", en: "Sep 2025 — Present" },
@@ -110,9 +110,9 @@ window.I18N = {
   // certs
   "cert.eyebrow": { es: "Acreditaciones", en: "Credentials" },
   "cert.title":   { es: 'Cursos y <span class="accent">Certificados</span>', en: 'Courses & <span class="accent">Certificates</span>' },
-  "cert.desc":    { es: 'Consola de proyección holográfica — selecciona un módulo para visualizar la credencial.', en: 'Holographic projector console — select a module to display the credential.' },
-  "cert.hint":    { es: 'Pasa el cursor sobre un logro', en: 'Hover over an achievement' },
-  "cert.console": { es: 'PROYECTOR DE CREDENCIALES', en: 'CREDENTIAL PROJECTOR' },
+  "cert.desc":    { es: 'Selecciona una certificación para consultar sus detalles y enlace de verificación.', en: 'Select a certification to view its details and verification link.' },
+  "cert.hint":    { es: 'Pasa el cursor sobre una certificación', en: 'Hover over a certification' },
+  "cert.console": { es: 'CREDENCIALES PROFESIONALES', en: 'PROFESSIONAL CREDENTIALS' },
   "cert.verify":  { es: 'Verificar credencial', en: 'Verify credential' },
   "c1.name": { es: "Desarrollo Móvil", en: "Mobile Development" },
   "c2.name": { es: "Proyecto Ganador · Móvil", en: "Winning Project · Mobile" },
@@ -126,7 +126,7 @@ window.I18N = {
   "info.eyebrow": { es: "Fuera del código", en: "Beyond the code" },
   "info.title":   { es: 'Información <span class="accent">Adicional</span>', en: 'Additional <span class="accent">Info</span>' },
   "i1.title": { es: "Walmart Code Ecosystem", en: "Walmart Code Ecosystem" },
-  "i1.tag":   { es: "LOGRO DESBLOQUEADO", en: "ACHIEVEMENT UNLOCKED" },
+  "i1.tag":   { es: "RECONOCIMIENTO", en: "RECOGNITION" },
   "i1.rank":  { es: "TOP 2 · HACKATHON", en: "TOP 2 · HACKATHON" },
   "i1.date":  { es: "Sep 2025", en: "Sep 2025" },
   "i1.desc":  { es: "2.º lugar en el hackathon de Walmart, destacando por el enfoque centrado en el usuario y el diseño de la app presentada.",
@@ -136,15 +136,15 @@ window.I18N = {
   "i2.out1":  { es: "metal · videojuegos · conciertos · gym", en: "metal · gaming · concerts · gym" },
   "i2.cmd2":  { es: "cat ~/.config/sobre_mi", en: "cat ~/.config/about_me" },
   "i2.date":  { es: "2016 — Actualidad", en: "2016 — Present" },
-  "i2.desc":  { es: "Personalizo a fondo entornos Linux desde 2016: resuelvo errores y creo interfaces armónicas. La misma obsesión por el detalle que llevo a cada proyecto.",
-                en: "I've deeply customized Linux environments since 2016: fixing bugs and crafting harmonious interfaces. The same obsession with detail I bring to every project." },
+  "i2.desc":  { es: "He profundizado en el mundo de GNU/Linux desde 2016: me gusta personalizar el Sistema Operativo completo, a la medida de mis necesidades, el solucionar errores y hacer de Linux un entorno comodo para trabajar.",
+                en: "I've been immersed in the GNU/Linux world since 2016. I enjoy customizing the entire operating system to fit my needs, troubleshooting issues, and turning Linux into a comfortable and productive environment to work in." },
 
   // contact
   "cta.title": { es: "¿Tienes una idea? Construyámosla.", en: "Got an idea? Let's build it." },
   "cta.eyebrow": { es: "Disponible para proyectos", en: "Available for projects" },
   "cta.avail": { es: "DISPONIBLE PARA NUEVOS PROYECTOS", en: "AVAILABLE FOR NEW PROJECTS" },
-  "tx.head": { es: "TRANSMISIÓN ENTRANTE", en: "INCOMING TRANSMISSION" },
-  "tx.status": { es: "● EN VIVO", en: "● LIVE" },
+  "tx.head": { es: "CONSULTA DE PROYECTO", en: "PROJECT INQUIRY" },
+  "tx.status": { es: "● ACTIVO", en: "● ACTIVE" },
   "cta.desc":  { es: "Apps móviles, sistemas con IA, automatización de procesos, aplicaciones web — convierto ideas en productos reales. ¡Hablemos!",
                  en: "Mobile apps, AI-powered systems, process automation, web applications — I turn ideas into real products. Let's talk." },
   "footer.text": { es: "Diseñado y codificado por Oscar Chávez Rosales", en: "Designed & coded by Oscar Chávez Rosales" },

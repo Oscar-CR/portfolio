@@ -39,7 +39,7 @@
   sections.forEach(s => navObserver.observe(s));
 
   /* ---------- hero mode switch ---------- */
-  const modeNames = ['NEURAL', 'CHROME', 'HUD'];
+  const modeNames = ['PERFIL 01', 'PERFIL 02', 'PERFIL 03'];
   const modeNameEl = document.getElementById('modeName');
   document.querySelectorAll('.mode-switch button').forEach(b => {
     b.addEventListener('click', function () {
