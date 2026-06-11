@@ -86,6 +86,34 @@
       .add({ targets: '.mode-switch, .scroll-hint', opacity: [0, 1], duration: 500 }, '-=200');
   }
 
+  /* ---------- ricing slideshow (info section) ---------- */
+  const ricing = document.getElementById('ricingShow');
+  if (ricing) {
+    const N = 7;
+    const idxEl = document.getElementById('ricingIdx');
+    const imgs = [];
+    for (let i = 1; i <= N; i++) {
+      const im = document.createElement('img');
+      im.src = 'img/linux' + i + '.jpg';
+      im.alt = 'Personalización de escritorio GNU/Linux ' + i + ' de ' + N;
+      im.loading = 'lazy';
+      im.draggable = false;
+      ricing.insertBefore(im, ricing.firstChild);
+      imgs.push(im);
+    }
+    let cur = 0, hover = false;
+    function showShot(n) {
+      cur = (n + N) % N;
+      imgs.forEach((im, k) => im.classList.toggle('on', k === cur));
+      if (idxEl) idxEl.textContent = String(cur + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0');
+    }
+    showShot(0);
+    ricing.addEventListener('click', () => showShot(cur + 1));
+    ricing.addEventListener('pointerenter', () => { hover = true; });
+    ricing.addEventListener('pointerleave', () => { hover = false; });
+    if (!reduced) setInterval(() => { if (!hover) showShot(cur + 1); }, 3800);
+  }
+
   /* ---------- boot loader ---------- */
   const boot = document.getElementById('boot');
   const fill = document.querySelector('.boot-fill');

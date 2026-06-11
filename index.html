@@ -141,14 +141,15 @@
       <button class="cmd-nav prev" id="cmdPrev" aria-label="anterior">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
       </button>
-      <div class="cmd-stage" id="cmdStage" tabindex="0">
-        <div class="cmd-track" id="cmdTrack"></div>
-        <div class="cmd-grid-floor" aria-hidden="true"></div>
+      <div class="holo-stage bracket" id="cmdStage" tabindex="0">
+        <div class="holo-track" id="cmdTrack"></div>
       </div>
       <button class="cmd-nav next" id="cmdNext" aria-label="siguiente">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
       </button>
     </div>
+
+    <div class="holo-thumbs" id="cmdThumbs" aria-label="proyectos"></div>
 
     <div class="cmd-hud">
       <div class="cmd-hud-left">
@@ -250,6 +251,10 @@
           </div>
           <h4 data-i18n="i1.title">Walmart Code Ecosystem</h4>
           <p data-i18n="i1.desc"></p>
+          <div class="achv-photos">
+            <figure class="ap"><img src="img/walmart1.jpg" alt="Equipo presentando en el hackathon Walmart Code Ecosystem" loading="lazy"><figcaption class="mono">CAM_01</figcaption></figure>
+            <figure class="ap"><img src="img/walmart2.jpg" alt="Premiación del hackathon Walmart Code Ecosystem" loading="lazy"><figcaption class="mono">CAM_02</figcaption></figure>
+          </div>
           <div class="achv-bar"><span style="width:88%"></span><em class="mono" data-i18n="i1.rank">TOP 2 · HACKATHON</em></div>
         </div>
       </article>
@@ -261,6 +266,10 @@
           <div class="term-body mono">
             <div class="tl"><span class="pr">$</span> <span data-i18n="i2.cmd2">cat ~/.config/sobre_mi</span></div>
             <div class="tl out"><span data-i18n="i2.desc"></span></div>
+            <div class="tl"><span class="pr">$</span> <span>feh ~/ricing --slideshow</span></div>
+            <div class="term-shot" id="ricingShow" title="click para avanzar">
+              <div class="ts-hud"><span id="ricingIdx">01 / 07</span><span>RICING.LOG</span></div>
+            </div>
             <div class="tl"><span class="pr">$</span> <span class="term-cursor">▋</span></div>
           </div>
         </div>

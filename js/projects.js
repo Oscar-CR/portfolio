@@ -1,8 +1,10 @@
 /* ============================================================
-   projects.js — "Command Center" holographic coverflow.
-   17 projects (5 public + 12 from the latest doc), category
-   filters (IA / Móvil / Web), and generated holographic demo
-   UIs built from iconography.
+   projects.js — "Holo-Showcase" 70/30.
+   17 projects (5 with real screenshots), category filters
+   (IA / Móvil / Web). Mac-style screen (70%) + info panel
+   (30%), thumbnail rail, autoplay and keyboard/swipe nav.
+   Projects without screenshot keep the generated holographic
+   demo UIs.
    ============================================================ */
 (function () {
   const C = '18e8ff';
@@ -30,16 +32,22 @@
 
     // ===== MÓVIL =====
     { cat: 'movil', demo: 'phone', badges: ['Laravel','Flutter'],
+      img: 'img/intranet.png',
+      alt: { es: 'Pantallas web y móviles de la Intranet Corporativa', en: 'Web and mobile screens of the Corporate Intranet' },
       title: { es: 'Intranet Corporativa', en: 'Corporate Intranet' },
       desc: { es: 'Sistema web y móvil para centralizar procesos, comunicación y gestión: vacaciones, comunicados, catálogo de proveedores, tickets y documentación interna.', en: 'Web & mobile system centralizing processes, communication and management: vacations, announcements, supplier catalog, tickets and internal docs.' },
       status: { es: 'Publicado', en: 'Live' },
       links: [ { t: 'Google Play', s: 'googleplay', u: 'https://play.google.com/store/apps/details?id=com.promolife.intranet_movil' }, { t: 'App Store', s: 'appstore', u: 'https://apps.apple.com/us/app/intranet-m%C3%B3vil/id6445901024' } ] },
     { cat: 'movil', demo: 'phone', badges: ['Flutter','NFC'],
+      img: 'img/promonfc.png',
+      alt: { es: 'Flujo de pantallas de la app Promo NFC: carga masiva y grabado de tarjetas', en: 'Promo NFC app screen flow: bulk upload and card encoding' },
       title: { es: 'Promo NFC', en: 'Promo NFC' },
       desc: { es: 'App interna para grabado masivo de tarjetas NFC: lectura CSV/Excel, listas masivas, compatibilidad RFID y validador de URLs y datos.', en: 'Internal app for bulk NFC card encoding: CSV/Excel reading, bulk lists, RFID compatibility and URL/data validator.' },
       status: { es: 'Publicado', en: 'Live' },
       links: [ { t: 'Google Play', s: 'googleplay', u: 'https://play.google.com/store/apps/details?id=com.promolife.nfc_app_movil' } ] },
     { cat: 'movil', demo: 'phone', badges: ['Java','Kotlin'],
+      img: 'img/segurapp.png',
+      alt: { es: 'Pantallas de SegurApp: mapa, contactos de confianza y registro', en: 'SegurApp screens: map, trusted contacts and sign-up' },
       title: { es: 'SegurApp', en: 'SegurApp' },
       desc: { es: 'App de seguridad personal con rastreo en tiempo real a contactos de confianza: push (FCM), Mapbox, GPS, Firestore + Room y APIs de seguridad pública.', en: 'Personal-safety app with real-time tracking to trusted contacts: push (FCM), Mapbox, GPS, Firestore + Room and public-safety APIs.' },
       status: { es: 'Open source', en: 'Open source' },
@@ -55,10 +63,14 @@
 
     // ===== WEB =====
     { cat: 'web', demo: 'web', badges: ['Laravel','MySQL','Tailwind'],
+      img: 'img/portales.png',
+      alt: { es: 'Portales e-commerce B2B: catálogo, detalle de producto e inicio de sesión', en: 'B2B e-commerce portals: catalog, product detail and login' },
       title: { es: 'E-commerce B2B', en: 'B2B E-commerce' },
       desc: { es: 'Múltiples portales e-commerce B2B a la medida con reglas de negocio por rol, conexión a compras internas del cliente, stock en tiempo real y cotización automática.', en: 'Multiple custom B2B e-commerce portals with role-based rules, integration to client purchasing systems, real-time stock and automatic quoting.' },
       status: { es: 'Web', en: 'Web' } },
     { cat: 'web', demo: 'web', badges: ['Laravel'],
+      img: 'img/cotizador.png',
+      alt: { es: 'Pantallas del cotizador de proveedores: catálogo, configuración y resumen', en: 'Supplier quoting engine screens: catalog, configuration and summary' },
       title: { es: 'Cotizador de Proveedores', en: 'Supplier Quoting Engine' },
       desc: { es: 'Cotizador de productos promocionales conectado al inventario de múltiples proveedores, con carga masiva (API/CSV/XLSX/XML), márgenes por actor y generación de PDF/email.', en: 'Promotional-product quoting engine linked to multiple supplier inventories, bulk import (API/CSV/XLSX/XML), per-actor margins and PDF/email generation.' },
       status: { es: 'Web', en: 'Web' } },
@@ -95,14 +107,24 @@
     web:   { es: 'Web', en: 'Web' }
   };
 
+  const AUTOPLAY_MS = 7000;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   let list = PROJECTS.slice();
   let active = 0;
   let filter = 'todos';
-  let stage, track, idxEl, catEl, nameEl;
+  let stage, track, thumbsEl, idxEl, catEl, nameEl;
+  let timer = null, paused = false;
 
   function L(o) { const lang = window.CURRENT_LANG || 'es'; return o[lang] != null ? o[lang] : o.es; }
 
-  // ---- holographic demo UI per category ----
+  function slug(p) {
+    return (p.title.en || p.title.es).toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+
+  // ---- holographic demo UI per category (fallback when no screenshot) ----
   function demoHTML(p) {
     const tech = p.badges.filter(b => ['Laravel','Flutter','Python','MySQL','Tailwind','Nginx','Ollama','ChromaDB','n8n','Java','Kotlin'].includes(b))
       .map(b => ({ Laravel:'laravel', Flutter:'flutter', Python:'python', MySQL:'mysql', Tailwind:'tailwindcss', Nginx:'nginx', Ollama:'ollama', ChromaDB:'', n8n:'n8n', Java:'openjdk', Kotlin:'kotlin' })[b])
@@ -162,46 +184,74 @@
     return `<span class="pill locked"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>${L(p.status)}</span>`;
   }
 
+  function screenHTML(p) {
+    return p.img
+      ? `<img class="hs-img" src="${p.img}" alt="${L(p.alt || p.title)}" loading="lazy" draggable="false">`
+      : `<div class="hs-demo">${demoHTML(p)}</div>`;
+  }
+
   function build() {
     track.innerHTML = '';
     list.forEach((p, i) => {
-      const card = document.createElement('article');
-      card.className = 'cmd-panel cat-' + p.cat;
-      card.innerHTML = `
-        <div class="cmd-panel-frame">
-          <div class="cp-demo">${demoHTML(p)}</div>
-          <div class="cp-info">
-            <div class="cp-cat">${(CATS[p.cat]||{}).es ? L(CATS[p.cat]) : p.cat}</div>
-            <h3 class="cp-title">${L(p.title)}</h3>
-            <p class="cp-desc">${L(p.desc)}</p>
-            <div class="cp-badges">${p.badges.map(b=>`<span class="badge">${b}</span>`).join('')}</div>
-            <div class="cp-foot">${statusPill(p)}</div>
+      const num = String(i + 1).padStart(2, '0');
+      const slide = document.createElement('article');
+      slide.className = 'holo-slide cat-' + p.cat;
+      slide.innerHTML = `
+        <div class="hs-screen">
+          <div class="hs-bar">
+            <span class="hs-dots"><i class="r"></i><i class="y"></i><i class="g"></i></span>
+            <span class="hs-url mono">ocr://${slug(p)}</span>
+            <span class="hs-sig mono"><i></i>SYS.${num}</span>
           </div>
-        </div>`;
-      card.addEventListener('click', () => { if (i !== active) setActive(i); });
-      track.appendChild(card);
+          <div class="hs-view">
+            ${screenHTML(p)}
+            <span class="hs-scan" aria-hidden="true"></span>
+          </div>
+        </div>
+        <aside class="hs-info">
+          <div class="hs-cat mono">${L(CATS[p.cat] || { es: p.cat, en: p.cat })} // ${num}</div>
+          <h3 class="hs-title">${L(p.title)}</h3>
+          <p class="hs-desc">${L(p.desc)}</p>
+          <div class="hs-badges">${p.badges.map(b=>`<span class="badge">${b}</span>`).join('')}</div>
+          <div class="hs-foot">${statusPill(p)}</div>
+        </aside>`;
+      track.appendChild(slide);
     });
-    layout();
+
+    thumbsEl.innerHTML = '';
+    list.forEach((p, i) => {
+      const b = document.createElement('button');
+      b.className = 'holo-thumb cat-' + p.cat;
+      b.setAttribute('aria-label', L(p.title));
+      b.innerHTML = p.img
+        ? `<img src="${p.img}" alt="" loading="lazy" draggable="false">`
+        : `<span class="ht-glyph mono">${String(i + 1).padStart(2, '0')}</span>`;
+      b.addEventListener('click', () => { setActive(i); restartAutoplay(); });
+      thumbsEl.appendChild(b);
+    });
+
+    setActive(Math.min(active, list.length - 1), 0, true);
   }
 
-  function layout() {
-    const panels = track.children;
-    for (let i = 0; i < panels.length; i++) {
-      const off = i - active;
-      const abs = Math.abs(off);
-      const el = panels[i];
-      if (abs > 3) { el.style.opacity = '0'; el.style.pointerEvents = 'none'; el.style.transform = `translateX(-50%) translateX(${off>0?700:-700}px) rotateY(0deg) scale(.6)`; continue; }
-      const x = off * 230;
-      const z = -abs * 200;
-      const ry = off === 0 ? 0 : (off > 0 ? -38 : 38);
-      const sc = off === 0 ? 1 : 0.86;
-      el.style.opacity = off === 0 ? '1' : (abs === 1 ? '0.7' : '0.35');
-      el.style.pointerEvents = 'auto';
-      el.style.zIndex = String(100 - abs);
-      el.style.transform = `translateX(-50%) translateX(${x}px) translateZ(${z}px) rotateY(${ry}deg) scale(${sc})`;
-      el.classList.toggle('is-active', off === 0);
+  function setActive(i, dir, instant) {
+    const n = list.length;
+    active = ((i % n) + n) % n; // wrap both ways
+    const slides = track.children;
+    for (let k = 0; k < slides.length; k++) slides[k].classList.toggle('is-active', k === active);
+    const thumbs = thumbsEl.children;
+    for (let k = 0; k < thumbs.length; k++) thumbs[k].classList.toggle('is-active', k === active);
+    // center the active thumb scrolling ONLY the rail — never the page
+    const t = thumbs[active];
+    if (t) {
+      const left = t.offsetLeft - (thumbsEl.clientWidth - t.offsetWidth) / 2;
+      thumbsEl.scrollTo({ left: Math.max(0, left), behavior: instant ? 'instant' : 'smooth' });
     }
     updateHUD();
+    if (!instant && !reduced && window.anime) {
+      const s = slides[active];
+      window.anime({ targets: s.querySelector('.hs-screen'), translateX: [(dir || 1) * 46, 0], opacity: [0, 1], duration: 620, easing: 'easeOutCubic' });
+      window.anime({ targets: s.querySelectorAll('.hs-info > *'), translateY: [18, 0], opacity: [0, 1], delay: window.anime.stagger(60, { start: 120 }), duration: 460, easing: 'easeOutCubic' });
+    }
   }
 
   function updateHUD() {
@@ -211,10 +261,17 @@
     if (nameEl && p) nameEl.textContent = L(p.title);
   }
 
-  function setActive(i) {
-    active = Math.max(0, Math.min(list.length - 1, i));
-    layout();
-    if (window.anime) window.anime({ targets: track.children[active].querySelector('.cp-info'), opacity: [0.4,1], translateY: [10,0], duration: 420, easing: 'easeOutCubic' });
+  function step(d) { setActive(active + d, d); }
+
+  // ---- autoplay ----
+  let inView = false;
+  function startAutoplay() {
+    if (reduced || timer) return;
+    timer = setInterval(() => { if (!paused && inView && list.length > 1) step(1); }, AUTOPLAY_MS);
+  }
+  function restartAutoplay() {
+    if (timer) { clearInterval(timer); timer = null; }
+    startAutoplay();
   }
 
   function setFilter(f) {
@@ -223,6 +280,7 @@
     active = 0;
     document.querySelectorAll('.cmd-filter').forEach(b => b.classList.toggle('active', b.dataset.cat === f));
     build();
+    restartAutoplay();
   }
 
   // re-render on language change
@@ -232,21 +290,40 @@
   document.addEventListener('DOMContentLoaded', () => {
     stage = document.getElementById('cmdStage');
     track = document.getElementById('cmdTrack');
+    thumbsEl = document.getElementById('cmdThumbs');
     idxEl = document.getElementById('cmdIdx');
     catEl = document.getElementById('cmdCat');
     nameEl = document.getElementById('cmdName');
     if (!track) return;
 
-    document.getElementById('cmdPrev').addEventListener('click', () => setActive(active - 1));
-    document.getElementById('cmdNext').addEventListener('click', () => setActive(active + 1));
+    document.getElementById('cmdPrev').addEventListener('click', () => { step(-1); restartAutoplay(); });
+    document.getElementById('cmdNext').addEventListener('click', () => { step(1); restartAutoplay(); });
     document.querySelectorAll('.cmd-filter').forEach(b => b.addEventListener('click', () => setFilter(b.dataset.cat)));
 
     // keyboard + drag
-    stage.addEventListener('keydown', (e) => { if (e.key==='ArrowLeft') setActive(active-1); if (e.key==='ArrowRight') setActive(active+1); });
+    stage.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { step(-1); restartAutoplay(); }
+      if (e.key === 'ArrowRight') { step(1); restartAutoplay(); }
+    });
     let sx = null;
     stage.addEventListener('pointerdown', (e) => { sx = e.clientX; });
-    stage.addEventListener('pointerup', (e) => { if (sx==null) return; const d = e.clientX - sx; if (Math.abs(d) > 50) setActive(active + (d<0?1:-1)); sx = null; });
+    stage.addEventListener('pointerup', (e) => {
+      if (sx == null) return;
+      const d = e.clientX - sx;
+      if (Math.abs(d) > 50) { step(d < 0 ? 1 : -1); restartAutoplay(); }
+      sx = null;
+    });
+
+    // pause autoplay while the visitor inspects a slide
+    ['pointerenter','focusin'].forEach(ev => stage.addEventListener(ev, () => { paused = true; }));
+    ['pointerleave','focusout'].forEach(ev => stage.addEventListener(ev, () => { paused = false; }));
+
+    // autoplay only while the showcase is on screen
+    new IntersectionObserver((entries) => {
+      entries.forEach(e => { inView = e.isIntersecting; });
+    }, { threshold: 0.25 }).observe(stage);
 
     build();
+    startAutoplay();
   });
 })();
