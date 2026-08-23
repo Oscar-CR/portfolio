@@ -43,7 +43,7 @@ window.I18N = {
   // projects
   "proj.eyebrow": { es: "Trabajo seleccionado", en: "Selected work" },
   "proj.title":   { es: 'Proyectos <span class="accent">Destacados</span>', en: 'Featured <span class="accent">Projects</span>' },
-  "proj.desc":    { es: 'Explora <b>17 proyectos</b> que he desarrollado: desde portales B2B y apps publicadas en tiendas, hasta soluciones de IA on-premise.', en: 'Explore <b>17 projects</b> I have delivered: from B2B portals and store-published apps to on-premise AI solutions.' },
+  "proj.desc":    { es: 'Explora <b>11 proyectos</b> que he desarrollado: desde portales B2B y apps publicadas en tiendas, hasta soluciones de IA on-premise.', en: 'Explore <b>11 projects</b> I have delivered: from B2B portals and store-published apps to on-premise AI solutions.' },
   "cat.todos":    { es: "Todos", en: "All" },
   "cat.ia":       { es: "IA", en: "AI" },
   "cat.movil":    { es: "Móvil", en: "Mobile" },
