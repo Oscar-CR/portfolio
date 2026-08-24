@@ -1,209 +1,162 @@
 /* ============================================================
-   scene.js — Three.js. Two scenes:
-   1) Full-page neural particle network (#bg-canvas)
-   2) Hero stage: animated robot droid + AI core (#hero-canvas)
-      with 3 swappable modes: NEURAL / CHROME / HUD
+   scene.js
+   1) Page backdrop: a drifting neural network on a 2D canvas (#bg-canvas).
+      Deliberately 2D, not WebGL: every link needs its own distance-based
+      alpha, which three r128 cannot express through per-vertex alpha, and a
+      2D context composites reliably where a full-viewport WebGL layer does
+      not. It also means the backdrop survives if the three CDN fails.
+   2) Hero stage: neural wireframe core + orbit rings, three.js (#hero-canvas)
    ============================================================ */
+
+/* ---------------- PAGE BACKDROP: NEURAL NETWORK ---------------- */
+(function neuralBackdrop() {
+  const canvas = document.getElementById('bg-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // One dial for the whole figure. It sits under every section, so it has to
+  // stay quiet enough that small text on top keeps its contrast.
+  const ALPHA = 0.75;
+  const INK = [[37, 99, 235], [124, 58, 237], [236, 72, 153]];  // blue / violet / fuchsia
+
+  let w = 0, h = 0, dpr = 1, link = 150, running = false;
+  const pts = [];
+
+  function spawn() {
+    const a = Math.random() * Math.PI * 2;
+    const sp = 0.10 + Math.random() * 0.26;              // px per frame: a slow drift
+    return {
+      x: Math.random() * (window.innerWidth || 1),
+      y: Math.random() * (window.innerHeight || 1),
+      vx: Math.cos(a) * sp,
+      vy: Math.sin(a) * sp,
+      r: 1.3 + Math.random() * 1.2,
+      c: INK[(Math.random() * INK.length) | 0],
+    };
+  }
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth; h = window.innerHeight;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Population and link radius both track the viewport so the mesh keeps the
+    // same visual density on a laptop and on an ultrawide.
+    link = Math.max(120, Math.min(190, Math.hypot(w, h) * 0.1));
+    const target = Math.max(34, Math.min(100, Math.round((w * h) / 21000)));
+    while (pts.length < target) pts.push(spawn());
+    pts.length = target;
+  }
+
+  // Signals fire along a link that actually exists right now, then re-target.
+  const pulses = [];
+  for (let i = 0; i < 5; i++) pulses.push({ a: 0, b: 0, t: 1, sp: 0.006 });
+
+  function retarget(s) {
+    for (let tries = 0; tries < 24; tries++) {
+      const i = (Math.random() * pts.length) | 0;
+      const j = (Math.random() * pts.length) | 0;
+      if (i === j) continue;
+      const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+      if (dx * dx + dy * dy < link * link) {
+        s.a = i; s.b = j; s.t = 0; s.sp = 0.004 + Math.random() * 0.008;
+        return;
+      }
+    }
+    s.t = 0.999;   // nothing in range this tick; it will try again next frame
+  }
+
+  function step() {
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      p.x += p.vx; p.y += p.vy;
+      // wrap, so the mesh keeps travelling across the whole canvas
+      if (p.x < -20) p.x = w + 20; else if (p.x > w + 20) p.x = -20;
+      if (p.y < -20) p.y = h + 20; else if (p.y > h + 20) p.y = -20;
+    }
+    for (let i = 0; i < pulses.length; i++) {
+      const s = pulses[i];
+      s.t += s.sp;
+      if (s.t >= 1) retarget(s);
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    ctx.globalAlpha = ALPHA;
+
+    // Links, with alpha falling off over distance so the mesh reads as depth
+    // instead of a flat web.
+    ctx.lineWidth = 1;
+    const lim = link * link;
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i];
+      for (let j = i + 1; j < pts.length; j++) {
+        const b = pts[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 > lim) continue;
+        const f = 1 - Math.sqrt(d2) / link;
+        ctx.strokeStyle = 'rgba(' + a.c[0] + ',' + a.c[1] + ',' + a.c[2] + ',' + (f * 0.30).toFixed(3) + ')';
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
+    }
+
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      ctx.fillStyle = 'rgba(' + p.c[0] + ',' + p.c[1] + ',' + p.c[2] + ',0.55)';
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    }
+
+    for (let i = 0; i < pulses.length; i++) {
+      const s = pulses[i];
+      const a = pts[s.a], b = pts[s.b];
+      if (!a || !b) continue;
+      ctx.fillStyle = 'rgba(' + a.c[0] + ',' + a.c[1] + ',' + a.c[2] + ',0.85)';
+      ctx.beginPath();
+      ctx.arc(a.x + (b.x - a.x) * s.t, a.y + (b.y - a.y) * s.t, 2.1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  function frame() {
+    step();
+    draw();
+    if (running) requestAnimationFrame(frame);
+  }
+
+  resize();
+  for (let i = 0; i < pulses.length; i++) retarget(pulses[i]);
+  if (reduced) draw(); else { running = true; frame(); }
+
+  window.addEventListener('resize', () => { resize(); if (reduced) draw(); });
+  // Don't burn frames on a hidden tab.
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) running = false;
+    else if (!reduced && !running) { running = true; frame(); }
+  });
+})();
+
 (function () {
   if (!window.THREE) { console.warn('THREE not loaded'); return; }
   const THREE = window.THREE;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const CYAN = 0x18e8ff, MAG = 0xff2bd6, VIO = 0x8b5cff;
+  // light-theme accents: primary blue / fuchsia / violet (var names kept for compatibility)
+  const CYAN = 0x2563eb, MAG = 0xec4899, VIO = 0x7c3aed;
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   window.addEventListener('pointermove', (e) => {
     mouse.tx = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.ty = (e.clientY / window.innerHeight) * 2 - 1;
   });
 
-  /* ---------------- BACKGROUND NEURAL NETWORK ---------------- */
-  (function bg() {
-    const canvas = document.getElementById('bg-canvas');
-    if (!canvas) return;
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x05030a, 60, 230);
-    const camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 40, 66);
-
-    // lights for the metallic spine
-    scene.add(new THREE.AmbientLight(0x33294d, 1.2));
-    const lc = new THREE.PointLight(CYAN, 2.6, 220); lc.position.set(-26, 30, 44); scene.add(lc);
-    const lm = new THREE.PointLight(MAG, 2.6, 220); lm.position.set(26, -20, 44); scene.add(lm);
-
-    const mobile = window.innerWidth < 760;
-
-    // ================= BIO-MECH SPINE =================
-    const spine = new THREE.Group();
-    scene.add(spine);
-
-    const TOP = 95, BOT = -95;             // spine vertical extent
-    const COUNT = mobile ? 20 : 30;        // vertebrae
-    const cyanC = new THREE.Color(CYAN), vioC = new THREE.Color(VIO), magC = new THREE.Color(MAG);
-    function gradAt(t) { // 0=top .. 1=bottom : cyan -> violet -> magenta
-      const c = new THREE.Color();
-      if (t < 0.5) c.copy(cyanC).lerp(vioC, t / 0.5);
-      else c.copy(vioC).lerp(magC, (t - 0.5) / 0.5);
-      return c;
-    }
-    // central path with gentle organic sway
-    function pathX(y) { return Math.sin(y * 0.05) * 7 + Math.sin(y * 0.013) * 4; }
-    function pathZ(y) { return Math.cos(y * 0.045) * 6 - 4; }
-
-    const curvePts = [];
-    for (let y = TOP; y >= BOT; y -= 4) curvePts.push(new THREE.Vector3(pathX(y), y, pathZ(y)));
-    const curve = new THREE.CatmullRomCurve3(curvePts);
-
-    // glowing energy cord (bright inner core + outer glow)
-    const coreMat = new THREE.MeshBasicMaterial({ color: 0xbff4ff, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false });
-    spine.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 160, 0.42, 8, false), coreMat));
-    const cordMat = new THREE.MeshBasicMaterial({ color: 0x3ad0ff, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending, depthWrite: false });
-    spine.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 150, 1.1, 10, false), cordMat));
-    // darker armored sheath around the cord
-    const sheathMat = new THREE.MeshStandardMaterial({ color: 0x1a1430, metalness: 0.9, roughness: 0.35, emissive: 0x140a28, emissiveIntensity: 0.5 });
-    spine.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 120, 1.5, 10, false), sheathMat));
-
-    const ringMatBase = { metalness: 0.95, roughness: 0.28 };
-    const up = new THREE.Vector3(0, 1, 0);
-    for (let i = 0; i < COUNT; i++) {
-      const ft = i / (COUNT - 1);
-      const y = TOP + (BOT - TOP) * ft;
-      const cx = pathX(y), cz = pathZ(y);
-      const col = gradAt(ft);
-      const vert = new THREE.Group();
-      vert.position.set(cx, y, cz);
-      // orient along the curve tangent
-      const tan = curve.getTangent(Math.min(0.999, ft)).normalize();
-      vert.quaternion.setFromUnitVectors(up, tan);
-
-      // vertebra ring (metallic disc)
-      const ringR = 5.0 + Math.sin(i * 0.6) * 0.6;
-      const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(ringR, 0.5, 8, 40),
-        new THREE.MeshStandardMaterial(Object.assign({ color: 0x2a2150, emissive: col, emissiveIntensity: 1.0 }, ringMatBase))
-      );
-      ring.rotation.x = Math.PI / 2;
-      vert.add(ring);
-
-      // inner glow ring (bright)
-      const halo = new THREE.Mesh(
-        new THREE.TorusGeometry(ringR * 0.64, 0.2, 6, 30),
-        new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 1.0, blending: THREE.AdditiveBlending, depthWrite: false })
-      );
-      halo.rotation.x = Math.PI / 2;
-      vert.add(halo);
-
-      // lateral processes (robotic struts) + tip nodes
-      [-1, 1].forEach(dir => {
-        const strut = new THREE.Mesh(
-          new THREE.BoxGeometry(3.0, 0.6, 0.6),
-          new THREE.MeshStandardMaterial(Object.assign({ color: 0x322556, emissive: col, emissiveIntensity: 0.5 }, ringMatBase))
-        );
-        strut.position.set(dir * (ringR + 1.2), 0, 0);
-        vert.add(strut);
-        const tip = new THREE.Mesh(
-          new THREE.SphereGeometry(0.62, 12, 12),
-          new THREE.MeshBasicMaterial({ color: col, blending: THREE.AdditiveBlending, depthWrite: false })
-        );
-        tip.position.set(dir * (ringR + 2.6), 0, 0);
-        vert.add(tip);
-      });
-      vert.userData = { baseRot: vert.rotation.z, phase: i * 0.4 };
-      spine.add(vert);
-    }
-
-    // DNA-ish helix of particles wrapping the cord
-    const hN = mobile ? 100 : 150, hPos = [], hCol = [];
-    for (let i = 0; i < hN; i++) {
-      const ft = i / hN;
-      const y = TOP + (BOT - TOP) * ft;
-      const ang = ft * Math.PI * 26 + (i % 2) * Math.PI;
-      const rr = 6.6;
-      hPos.push(pathX(y) + Math.cos(ang) * rr, y, pathZ(y) + Math.sin(ang) * rr);
-      const c = gradAt(ft); hCol.push(c.r, c.g, c.b);
-    }
-    const hGeo = new THREE.BufferGeometry();
-    hGeo.setAttribute('position', new THREE.Float32BufferAttribute(hPos, 3));
-    hGeo.setAttribute('color', new THREE.Float32BufferAttribute(hCol, 3));
-    const helix = new THREE.Points(hGeo, new THREE.PointsMaterial({ size: 0.7, vertexColors: true, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }));
-    spine.add(helix);
-
-    // travelling energy pulses along the cord
-    const pulses = [];
-    for (let i = 0; i < 4; i++) {
-      const m = new THREE.Mesh(new THREE.SphereGeometry(0.85, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false }));
-      m.userData = { t: i / 4, sp: 0.05 + Math.random() * 0.02 };
-      spine.add(m); pulses.push(m);
-    }
-
-    // ================= ambient particle dust =================
-    const dN = mobile ? 90 : 170, dPos = [], dCol = [];
-    for (let i = 0; i < dN; i++) {
-      dPos.push((Math.random() - 0.5) * 220, (Math.random() - 0.5) * 240, -40 - Math.random() * 160);
-      const c = Math.random() < 0.5 ? cyanC : magC; dCol.push(c.r, c.g, c.b);
-    }
-    const dGeo = new THREE.BufferGeometry();
-    dGeo.setAttribute('position', new THREE.Float32BufferAttribute(dPos, 3));
-    dGeo.setAttribute('color', new THREE.Float32BufferAttribute(dCol, 3));
-    const dust = new THREE.Points(dGeo, new THREE.PointsMaterial({ size: 0.8, vertexColors: true, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false }));
-    scene.add(dust);
-
-    const clock = new THREE.Clock();
-    let camY = 40;
-    function frame() {
-      try { frameBody(); } catch (err) { window.__bgErr = (err && err.message) + ' | ' + ((err && err.stack || '').split('\n')[1] || ''); return; }
-      requestAnimationFrame(frame);
-    }
-    function frameBody() {
-      const t = clock.getElapsedTime();
-      // scroll travel
-      const docH = document.documentElement.scrollHeight - window.innerHeight;
-      const frac = docH > 0 ? (window.scrollY || 0) / docH : 0;
-      const targetY = 46 - frac * 92;
-      camY += (targetY - camY) * 0.06;
-      camera.position.y = camY;
-
-      // mouse parallax
-      mouse.x += (mouse.tx - mouse.x) * 0.04;
-      mouse.y += (mouse.ty - mouse.y) * 0.04;
-      camera.position.x = mouse.x * 10;
-      spine.rotation.y = 0.12 + mouse.x * 0.22 + Math.sin(t * 0.15) * 0.05;
-      camera.lookAt(mouse.x * 4, camY - 6, -6);
-
-      // pulse the halos / lights
-      lc.position.y = camY + 26; lm.position.y = camY - 26;
-      // vertebra breathing
-      spine.children.forEach((ch) => {
-        if (ch.userData && ch.userData.phase != null) {
-          const b = 1 + Math.sin(t * 1.4 + ch.userData.phase) * 0.04;
-          ch.scale.setScalar(b);
-        }
-      });
-      // energy pulses travel
-      pulses.forEach(p => {
-        p.userData.t += p.userData.sp * 0.02;
-        if (p.userData.t > 1) p.userData.t -= 1;
-        const pt = curve.getPoint(p.userData.t);
-        p.position.copy(pt);
-        p.scale.setScalar(0.8 + Math.sin(t * 6 + p.userData.t * 10) * 0.3);
-      });
-      helix.rotation.y = t * 0.05;
-      dust.rotation.y += 0.0003;
-
-      renderer.render(scene, camera);
-    }
-    if (reduced) { camera.position.y = 0; camera.lookAt(0, -6, -6); renderer.render(scene, camera); } else frame();
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-  })();
-
-  /* ---------------- HERO ROBOT DROID ---------------- */
+  /* ---------------- HERO BACKDROP (neural core) ---------------- */
   (function hero() {
     const canvas = document.getElementById('hero-canvas');
     if (!canvas) return;
@@ -216,349 +169,65 @@
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
     camera.position.set(0, 0.3, 12);
+    // Widest thing in the scene is the outer floating dots (max radius 3.8).
+    // Framing to that on BOTH axes is what keeps the orbit rings and the outer
+    // dots from being cut off on desktop, where the stage is nearly square.
+    const CONTENT_RADIUS = 3.9;
     function fitCamera() {
       const halfFov = (camera.fov / 2) * Math.PI / 180;
-      const fitH = 3.2 / Math.tan(halfFov);
-      const fitW = 3.0 / (Math.tan(halfFov) * camera.aspect);
+      const fitH = CONTENT_RADIUS / Math.tan(halfFov);
+      const fitW = CONTENT_RADIUS / (Math.tan(halfFov) * camera.aspect);
       camera.position.z = Math.max(fitH, fitW) + 0.6;
     }
 
-    // lights
-    scene.add(new THREE.AmbientLight(0x404060, 1.1));
-    const key = new THREE.DirectionalLight(0xffffff, 1.0); key.position.set(3, 4, 5); scene.add(key);
-    const lc = new THREE.PointLight(CYAN, 2.4, 30); lc.position.set(-4, 1, 4); scene.add(lc);
-    const lm = new THREE.PointLight(MAG, 2.4, 30); lm.position.set(4, -1, 3); scene.add(lm);
+    // Every mesh here is unlit (MeshBasicMaterial), so the scene needs no lights.
+    const accentCyan = new THREE.MeshBasicMaterial({ color: CYAN });
+    const accentMag  = new THREE.MeshBasicMaterial({ color: MAG });
 
-    // ============ FRIENDLY DINO-BOT (Dyno) ============
-    const robot = new THREE.Group();
-    scene.add(robot);
-
-    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x17122b, metalness: 0.7, roughness: 0.38 });
-    const panelMat = new THREE.MeshStandardMaterial({ color: 0x2a1f48, metalness: 0.85, roughness: 0.3 });
-    const bellyMat = new THREE.MeshStandardMaterial({ color: 0x352a55, metalness: 0.5, roughness: 0.45 });
-    const glowCyan = new THREE.MeshBasicMaterial({ color: CYAN });
-    const glowMag  = new THREE.MeshBasicMaterial({ color: MAG });
-    const darkMat  = new THREE.MeshStandardMaterial({ color: 0x05060c, metalness: 0.3, roughness: 0.4 });
-
-    // legs + feet
-    [-0.55, 0.55].forEach(x => {
-      const thigh = new THREE.Mesh(new THREE.BoxGeometry(0.62, 1.0, 0.7), bodyMat);
-      thigh.position.set(x, -1.35, 0.05); robot.add(thigh);
-      const knee = new THREE.Mesh(new THREE.SphereGeometry(0.34, 14, 14), panelMat);
-      knee.position.set(x, -1.78, 0.1); robot.add(knee);
-      const foot = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.3, 1.05), panelMat);
-      foot.position.set(x, -2.0, 0.32); robot.add(foot);
-      // toe claws
-      [-0.22, 0, 0.22].forEach(tx => {
-        const claw = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.22, 8), glowCyan);
-        claw.rotation.x = Math.PI / 2; claw.position.set(x + tx, -2.02, 0.86); robot.add(claw);
-      });
-    });
-
-    // body / torso (chunky, slight forward lean)
-    const torso = new THREE.Mesh(new THREE.BoxGeometry(1.75, 1.85, 1.4), bodyMat);
-    torso.position.set(0, -0.35, 0); torso.rotation.x = 0.06; robot.add(torso);
-    // belly plate
-    const belly = new THREE.Mesh(new THREE.BoxGeometry(1.15, 1.35, 0.14), bellyMat);
-    belly.position.set(0, -0.45, 0.69); robot.add(belly);
-    // belly ridges
-    [-0.25, 0.05, 0.35].forEach(yy => {
-      const ridge = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.06, 0.04), darkMat);
-      ridge.position.set(0, -0.45 + yy, 0.77); robot.add(ridge);
-    });
-    // chest reactor (kept)
-    const reactor = new THREE.Mesh(new THREE.SphereGeometry(0.26, 24, 24), glowCyan);
-    reactor.position.set(0, 0.12, 0.74); robot.add(reactor);
-    const reactorRing = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.05, 10, 30), glowMag);
-    reactorRing.position.set(0, 0.12, 0.74); robot.add(reactorRing);
-    const reactorLight = new THREE.PointLight(CYAN, 1.6, 5); reactorLight.position.set(0, 0.12, 1.1); robot.add(reactorLight);
-
-    // tiny T-rex arms
-    [-1, 1].forEach(dir => {
-      const arm = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.62, 0.26), panelMat);
-      arm.position.set(dir * 0.98, -0.2, 0.45); arm.rotation.z = dir * 0.5; robot.add(arm);
-      const claw = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.26, 8), glowCyan);
-      claw.position.set(dir * 1.2, -0.55, 0.55); claw.rotation.x = Math.PI / 2; robot.add(claw);
-    });
-
-    // neck
-    const neck = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.85, 0.85), bodyMat);
-    neck.position.set(0, 0.7, 0.2); robot.add(neck);
-
-    // ---- HEAD group (friendly) ----
-    const head = new THREE.Group();
-    head.position.set(0, 1.5, 0.25); robot.add(head);
-    const skull = new THREE.Mesh(new THREE.BoxGeometry(1.55, 1.2, 1.35), bodyMat);
-    head.add(skull);
-    // snout / muzzle
-    const snout = new THREE.Mesh(new THREE.BoxGeometry(1.15, 0.72, 0.8), panelMat);
-    snout.position.set(0, -0.2, 0.92); head.add(snout);
-    // smile line
-    const smile = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.08, 0.06), glowCyan);
-    smile.position.set(0, -0.42, 1.33); head.add(smile);
-    // nostrils
-    [-0.22, 0.22].forEach(x => {
-      const n = new THREE.Mesh(new THREE.CircleGeometry(0.06, 12), darkMat);
-      n.position.set(x, -0.05, 1.33); head.add(n);
-    });
-    // visor band
-    const visor = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.55, 0.1), darkMat);
-    visor.position.set(0, 0.15, 0.72); head.add(visor);
-    // big friendly eyes
-    const eyeGeo = new THREE.SphereGeometry(0.23, 18, 18);
-    const eyeL = new THREE.Mesh(eyeGeo, glowCyan); eyeL.position.set(-0.4, 0.16, 0.82); head.add(eyeL);
-    const eyeR = new THREE.Mesh(eyeGeo, glowCyan); eyeR.position.set(0.4, 0.16, 0.82); head.add(eyeR);
-    // brow plates (cute)
-    [-0.4, 0.4].forEach(x => {
-      const brow = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.1, 0.12), panelMat);
-      brow.position.set(x, 0.42, 0.8); brow.rotation.z = x < 0 ? 0.12 : -0.12; head.add(brow);
-    });
-    // sensor crest (keeps antTip name for animation)
-    const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.5, 8), panelMat);
-    ant.position.set(0, 0.85, 0); head.add(ant);
-    const antTip = new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 16), glowMag);
-    antTip.position.set(0, 1.15, 0); head.add(antTip);
-    const antGlow = new THREE.PointLight(MAG, 1.4, 5); antGlow.position.set(0, 1.15, 0); head.add(antGlow);
-
-    // back fins / dino spikes (along back, into the tail)
-    const fins = [];
-    const finData = [[0.62,0.95,-0.5],[0.28,1.15,-0.95],[-0.12,1.05,-1.5],[-0.5,0.8,-2.0]];
-    finData.forEach(([yy, s, zz]) => {
-      const fin = new THREE.Mesh(new THREE.ConeGeometry(0.32 * s, 0.95 * s, 4), glowCyan);
-      fin.position.set(0, yy, zz); fins.push(fin); robot.add(fin);
-    });
-
-    // ---- TAIL group (sways) ----
-    const tail = new THREE.Group(); tail.position.set(0, -0.5, -0.7); robot.add(tail);
-    let tx = 0, ty = 0, tz = 0, ts = 1.05;
-    for (let i = 0; i < 6; i++) {
-      const seg = new THREE.Mesh(new THREE.BoxGeometry(0.72 * ts, 0.72 * ts, 0.78 * ts), i % 2 ? panelMat : bodyMat);
-      tz -= 0.52 * ts; ty += 0.16 * i;
-      seg.position.set(0, ty, tz); tail.add(seg);
-      ts *= 0.8;
-    }
-    const tailTip = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.5, 4), glowMag);
-    tailTip.position.set(0, ty + 0.15, tz - 0.3); tailTip.rotation.x = -0.6; tail.add(tailTip);
-
-    robot.scale.set(0.82, 0.82, 0.82);
-    robot.position.y = -0.2;
-
-    // ---- orbit rings (always) ----
+    // ---- orbit rings ----
     const ringGroup = new THREE.Group(); scene.add(ringGroup);
     const ring1 = new THREE.Mesh(new THREE.TorusGeometry(3.4, 0.012, 8, 80), new THREE.MeshBasicMaterial({ color: CYAN, transparent: true, opacity: 0.6 }));
     ring1.rotation.x = Math.PI/2.2; ringGroup.add(ring1);
     const ring2 = new THREE.Mesh(new THREE.TorusGeometry(3.0, 0.012, 8, 80), new THREE.MeshBasicMaterial({ color: MAG, transparent: true, opacity: 0.6 }));
     ring2.rotation.x = Math.PI/3; ring2.rotation.y = Math.PI/5; ringGroup.add(ring2);
-    // orbiting dots on ring1
+    // orbiting dots riding each ring
     const orbGeo = new THREE.SphereGeometry(0.08, 12, 12);
-    const orb1 = new THREE.Mesh(orbGeo, glowCyan); ring1.add(orb1);
-    const orb2 = new THREE.Mesh(orbGeo, glowMag); ring2.add(orb2);
+    const orb1 = new THREE.Mesh(orbGeo, accentCyan); ring1.add(orb1);
+    const orb2 = new THREE.Mesh(orbGeo, accentMag); ring2.add(orb2);
 
-    // ---- MODE-SPECIFIC GROUPS ----
-    // NEURAL: wireframe icosahedron core behind robot
-    const neural = new THREE.Group(); scene.add(neural);
-    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(2.6, 1), new THREE.MeshBasicMaterial({ color: VIO, wireframe: true, transparent: true, opacity: 0.2 }));
-    core.position.z = -1.5; neural.add(core);
-    // floating neural dots
-    const nDots = new THREE.Group(); neural.add(nDots);
+    // ---- neural core: wireframe icosahedron + floating dots ----
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(2.6, 1), new THREE.MeshBasicMaterial({ color: VIO, wireframe: true, transparent: true, opacity: 0.35 }));
+    core.position.z = -1.5; scene.add(core);
+    const nDots = new THREE.Group(); scene.add(nDots);
     for (let i = 0; i < 26; i++) {
-      const d = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), Math.random()<0.5?glowCyan:glowMag);
-      const a = Math.random()*Math.PI*2, r = 2.8 + Math.random()*1.4, y = (Math.random()-0.5)*4;
+      const d = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), Math.random()<0.5?accentCyan:accentMag);
+      const a = Math.random()*Math.PI*2, r = 2.9 + Math.random()*0.9, y = (Math.random()-0.5)*4;
       d.position.set(Math.cos(a)*r, y, Math.sin(a)*r - 1.5);
       d.userData = { a, r, y, s: 0.2 + Math.random()*0.5 };
       nDots.add(d);
     }
 
-    // CHROME: metallic torus knot + chrome robot tint
-    const chrome = new THREE.Group(); scene.add(chrome); chrome.visible = false;
-    const knot = new THREE.Mesh(new THREE.TorusKnotGeometry(2.3, 0.18, 140, 18, 2, 3),
-      new THREE.MeshStandardMaterial({ color: 0xaad4ff, metalness: 1.0, roughness: 0.12, emissive: 0x220033, emissiveIntensity: 0.4 }));
-    knot.position.z = -1; chrome.add(knot);
-
-    // HUD: grid plane + reticle rings + scan
-    const hud = new THREE.Group(); scene.add(hud); hud.visible = false;
-    const grid = new THREE.GridHelper(16, 32, CYAN, 0x33224d);
-    grid.position.y = -2.6; grid.material.transparent = true; grid.material.opacity = 0.4; hud.add(grid);
-    const reticle = new THREE.Mesh(new THREE.RingGeometry(3.1, 3.2, 64), new THREE.MeshBasicMaterial({ color: CYAN, transparent: true, opacity: 0.5, side: THREE.DoubleSide }));
-    hud.add(reticle);
-    const reticle2 = new THREE.Mesh(new THREE.RingGeometry(2.6, 2.64, 6), new THREE.MeshBasicMaterial({ color: MAG, transparent: true, opacity: 0.6, side: THREE.DoubleSide }));
-    hud.add(reticle2);
-    // crosshair ticks
-    for (let i = 0; i < 4; i++) {
-      const tick = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.04), new THREE.MeshBasicMaterial({ color: CYAN, transparent:true, opacity:0.7 }));
-      const ang = i * Math.PI/2;
-      tick.position.set(Math.cos(ang)*3.5, Math.sin(ang)*3.5, 0); tick.rotation.z = ang;
-      hud.add(tick);
-    }
-
-    let mode = 0;
-    const modes = [neural, chrome, hud];
-    window.HeroScene = {
-      setMode(n) {
-        mode = n;
-        modes.forEach((g, i) => g.visible = (i === n));
-        // robot material shift
-        if (n === 1) { // chrome
-          bodyMat.color.setHex(0x9fb8d8); bodyMat.metalness = 1.0; bodyMat.roughness = 0.1;
-          panelMat.color.setHex(0xc0d4f0);
-        } else {
-          bodyMat.color.setHex(0x14101f); bodyMat.metalness = 0.75; bodyMat.roughness = 0.35;
-          panelMat.color.setHex(0x241a3a); panelMat.metalness = 0.9; panelMat.roughness = 0.25;
-        }
-        ring1.material.color.setHex(n === 2 ? MAG : CYAN);
-      }
-    };
-
-    // ---- click interaction: quick "happy" reaction + greeting bubble ----
-    let cheerUntil = 0;
-    let cheerLevel = 0;
-    let popTimer = null;
-    const stage = canvas.parentElement;
-    const heroMouse = { x: 0, y: 0, tx: 0, ty: 0 };
-    const raycaster = new THREE.Raycaster();
-    const pointerNdc = new THREE.Vector2(10, 10);
-    let pointerInside = false;
-    let dinoHover = false;
-
-    function getHoverHintText() {
-      return (window.CURRENT_LANG || 'es') === 'en' ? 'Click Dyno' : 'Haz clic en Dyno';
-    }
-
-    function setHoverState(on) {
-      if (dinoHover === on) return;
-      dinoHover = on;
-      canvas.style.cursor = on ? 'pointer' : 'default';
-      if (stage) {
-        stage.dataset.dynoHint = getHoverHintText();
-        stage.classList.toggle('is-dyno-hover', on);
-      }
-    }
-
-    function updateRayPointer(e) {
-      const rect = canvas.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      pointerNdc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      pointerNdc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-    }
-
-    function updateHeroPointerTargets(e) {
-      const rect = canvas.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      // Track globally: map pointer position relative to hero canvas, even when cursor is outside it.
-      heroMouse.tx = THREE.MathUtils.clamp(((e.clientX - rect.left) / rect.width) * 2 - 1, -1.2, 1.2);
-      heroMouse.ty = THREE.MathUtils.clamp(((e.clientY - rect.top) / rect.height) * 2 - 1, -1.2, 1.2);
-    }
-
-    function updateHoverHit() {
-      if (!pointerInside) { setHoverState(false); return false; }
-      raycaster.setFromCamera(pointerNdc, camera);
-      const hits = raycaster.intersectObjects(robot.children, true);
-      const hit = hits.length > 0;
-      setHoverState(hit);
-      return hit;
-    }
-
-    function sayHi() {
-      if (!stage) return;
-      let bubble = stage.querySelector('.hero-dyno-pop');
-      if (!bubble) {
-        bubble = document.createElement('div');
-        bubble.className = 'hero-dyno-pop';
-        stage.appendChild(bubble);
-      }
-      bubble.textContent = (window.CURRENT_LANG || 'es') === 'en' ? 'Rawr! Hi!' : 'Rawr! Hola!';
-      bubble.classList.remove('show');
-      void bubble.offsetWidth; // retrigger css animation
-      bubble.classList.add('show');
-      if (popTimer) clearTimeout(popTimer);
-      popTimer = setTimeout(() => bubble.classList.remove('show'), 1200);
-    }
-    canvas.addEventListener('pointermove', (e) => {
-      pointerInside = true;
-      updateRayPointer(e);
-      updateHeroPointerTargets(e);
-      updateHoverHit();
-    });
-    canvas.addEventListener('pointerenter', (e) => {
-      pointerInside = true;
-      updateRayPointer(e);
-      updateHeroPointerTargets(e);
-      updateHoverHit();
-    });
-    canvas.addEventListener('pointerleave', () => {
-      pointerInside = false;
-      setHoverState(false);
-    });
-    canvas.addEventListener('pointerdown', (e) => {
-      updateRayPointer(e);
-      updateHeroPointerTargets(e);
-      if (!updateHoverHit()) return;
-      cheerUntil = performance.now() + 1300;
-      sayHi();
-    });
-    // Keep look tracking active even when pointer moves outside hero canvas.
-    window.addEventListener('pointermove', updateHeroPointerTargets);
-
     const clock = new THREE.Clock();
     function frame() {
       const t = clock.getElapsedTime();
-      const now = performance.now();
-      const cheerTarget = now < cheerUntil ? 1 : 0;
-      cheerLevel += (cheerTarget - cheerLevel) * 0.14;
-      if (pointerInside) updateHoverHit();
-      // robot idle hover + look
-      heroMouse.x += (heroMouse.tx - heroMouse.x) * 0.08;
-      heroMouse.y += (heroMouse.ty - heroMouse.y) * 0.08;
-      const lookX = THREE.MathUtils.clamp(heroMouse.x, -0.95, 0.95);
-      const lookY = THREE.MathUtils.clamp(-heroMouse.y, -0.95, 0.95);
-      robot.position.y = -0.2 + Math.sin(t * 1.3) * 0.16 + Math.sin(t * 8.2) * 0.03 * cheerLevel;
-      // Keep a slight hero angle, but allow subtle tracking so it does not stare to one side.
-      robot.rotation.y = -0.08 + lookX * 0.32 + Math.sin(t * 0.4) * 0.06;
-      robot.rotation.x = lookY * 0.08;
-      robot.rotation.z = Math.sin(t * 7.4) * 0.03 * cheerLevel;
-      neck.rotation.y = lookX * 0.18;
-      neck.rotation.x = -lookY * 0.12;
-      head.rotation.y = lookX * 0.45;
-      head.rotation.x = -lookY * 0.24 + Math.sin(t * 0.6) * 0.03;
-      head.rotation.z = Math.sin(t * 0.8) * 0.04 + Math.sin(t * 9.5) * 0.07 * cheerLevel;
-      // tail sway + fin shimmer
-      tail.rotation.y = Math.sin(t * 1.6) * 0.18 + Math.sin(t * 10.5) * 0.12 * cheerLevel;
-      tail.rotation.x = Math.sin(t * 1.2) * 0.06;
-      fins.forEach((f, i) => f.scale.setScalar(1 + Math.sin(t * 2 + i * 0.6) * 0.08));
-      // blink-ish eye pulse
-      const ep = 0.7 + Math.sin(t*3)*0.3;
-      eyeL.scale.y = ep * (1 - cheerLevel * 0.22);
-      eyeR.scale.y = ep * (1 - cheerLevel * 0.22);
-      eyeL.scale.x = 1 + cheerLevel * 0.12;
-      eyeR.scale.x = 1 + cheerLevel * 0.12;
-      reactorRing.rotation.z += 0.02;
-      antTip.scale.setScalar(1 + Math.sin(t*4)*0.15 + cheerLevel * 0.2);
-      reactorLight.intensity = 1.6 + cheerLevel * 0.9;
 
-      // rings
+      // rings + orbiting dots
       ring1.rotation.z += 0.004; ring2.rotation.z -= 0.005;
       orb1.position.set(Math.cos(t*1.2)*3.4, Math.sin(t*1.2)*3.4, 0);
       orb2.position.set(Math.cos(-t*1.5)*3.0, Math.sin(-t*1.5)*3.0, 0);
 
-      // mode anims
-      if (mode === 0) {
-        core.rotation.y += 0.003; core.rotation.x += 0.0015;
-        nDots.children.forEach(d => {
-          d.userData.a += 0.003 * d.userData.s;
-          d.position.x = Math.cos(d.userData.a) * d.userData.r;
-          d.position.z = Math.sin(d.userData.a) * d.userData.r - 1.5;
-          d.position.y = d.userData.y + Math.sin(t + d.userData.r) * 0.2;
-        });
-      } else if (mode === 1) {
-        knot.rotation.y += 0.006; knot.rotation.x += 0.003;
-      } else {
-        reticle.rotation.z += 0.004; reticle2.rotation.z -= 0.01; hud.rotation.y = Math.sin(t*0.3)*0.1;
-      }
+      // neural core drift
+      core.rotation.y += 0.003; core.rotation.x += 0.0015;
+      nDots.children.forEach(d => {
+        d.userData.a += 0.003 * d.userData.s;
+        d.position.x = Math.cos(d.userData.a) * d.userData.r;
+        d.position.z = Math.sin(d.userData.a) * d.userData.r - 1.5;
+        d.position.y = d.userData.y + Math.sin(t + d.userData.r) * 0.2;
+      });
 
       renderer.render(scene, camera);
       if (heroRunning) requestAnimationFrame(frame);
     }
-    window.HeroScene.setMode(0);
     let heroRunning = !reduced;
     if (reduced) renderer.render(scene, camera); else frame();
     // pause the hero loop when it scrolls out of view (perf)

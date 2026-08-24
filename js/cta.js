@@ -41,21 +41,24 @@
     const dpr = Math.min(window.devicePixelRatio, 2);
     let warpRunning = false;
     function frame() {
-      ctx.fillStyle = 'rgba(5,3,10,0.32)';
+      // light trail wash: streaks fade out toward the near-white page background
+      ctx.fillStyle = 'rgba(248, 250, 252,0.32)';
       ctx.fillRect(0, 0, w, h);
       for (const s of stars) {
         s.pr = s.r; s.r += s.sp * dpr * (1 + s.r / Math.max(w, h));
         const x1 = cx + Math.cos(s.a) * s.pr, y1 = cy + Math.sin(s.a) * s.pr;
         const x2 = cx + Math.cos(s.a) * s.r, y2 = cy + Math.sin(s.a) * s.r;
         const t = Math.min(1, s.r / (Math.max(w, h) * 0.55));
-        ctx.strokeStyle = s.mag ? `rgba(255,43,214,${t})` : `rgba(24,232,255,${t})`;
+        // pink / blue lines: faint (but still visible) near the center, saturated at the edges
+        const a = 0.12 + t * 0.8;
+        ctx.strokeStyle = s.mag ? `rgba(236, 72, 153,${a})` : `rgba(37, 99, 235,${a})`;
         ctx.lineWidth = (0.6 + t * 1.8) * dpr;
         ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
         if (s.r > Math.max(w, h) * 0.62) { Object.assign(s, mk()); }
       }
       if (warpRunning) requestAnimationFrame(frame);
     }
-    if (reduced) { ctx.fillStyle = '#05030a'; ctx.fillRect(0,0,w,h); }
+    if (reduced) { ctx.fillStyle = '#f8fafc'; ctx.fillRect(0,0,w,h); }
     else {
       // only run the warp while the CTA is on-screen (perf)
       const io = new IntersectionObserver(([e]) => {

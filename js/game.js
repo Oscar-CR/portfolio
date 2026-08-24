@@ -4,7 +4,9 @@
    Score + best (localStorage). i18n labels.
    ============================================================ */
 (function () {
-  const CYAN = '#18e8ff', MAG = '#ff2bd6', VIO = '#8b5cff', WHITE = '#eafcff';
+  // light theme palette: blue / pink / violet accents, slate ink, neutral surfaces
+  const CYAN = '#2563eb', MAG = '#ec4899', VIO = '#7c3aed', WHITE = '#ffffff';
+  const INK = '#0f172a';
 
   let cv, ctx, stage, overlay, msgEl, scoreEl, bestEl;
   let W = 0, H = 0, dpr = 1;
@@ -126,15 +128,16 @@
   // ---- drawing ----
   function draw() {
     ctx.clearRect(0, 0, W, H);
-    // stars
-    for (const s of stars) { ctx.globalAlpha = 0.4 + s.z * 0.3; ctx.fillStyle = s.s ? CYAN : MAG; ctx.fillRect(s.x, s.y, 2, 2); }
+    // stars (blue / pink specks; the far ones fade toward the light background)
+    for (const s of stars) { ctx.globalAlpha = 0.25 + s.z * 0.3; ctx.fillStyle = s.s ? CYAN : MAG; ctx.fillRect(s.x, s.y, 2, 2); }
     ctx.globalAlpha = 1;
     // ground line
-    ctx.strokeStyle = 'rgba(24,232,255,0.5)'; ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(37, 99, 235,0.55)'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(0, groundY + 1); ctx.lineTo(W, groundY + 1); ctx.stroke();
-    ctx.shadowBlur = 10; ctx.shadowColor = CYAN; ctx.stroke(); ctx.shadowBlur = 0;
+    // soft blue haze under the line (reads as a shadow on light, not a neon glow)
+    ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(37, 99, 235,0.35)'; ctx.stroke(); ctx.shadowBlur = 0;
     // ground ticks
-    ctx.strokeStyle = 'rgba(139,92,255,0.4)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(124, 58, 237,0.35)'; ctx.lineWidth = 1;
     const tick = (performance.now() * 0.001 * speed) % 40;
     for (let x = -tick; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, groundY + 6); ctx.lineTo(x + 10, groundY + 6); ctx.stroke(); }
 
@@ -146,25 +149,27 @@
     const x = dino.x, y = dino.y, w = dino.w, h = dino.h;
     ctx.save();
     ctx.translate(x, y);
-    ctx.shadowBlur = 14; ctx.shadowColor = CYAN;
-    ctx.fillStyle = '#1a1330';
-    ctx.strokeStyle = CYAN; ctx.lineWidth = 2;
+    // soft slate drop shadow instead of the old neon halo
+    ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(15, 23, 42,0.18)';
+    ctx.fillStyle = WHITE;                       // light body surface
+    ctx.strokeStyle = INK; ctx.lineWidth = 2;    // dark slate outline
     // body
     rr(8, 14, 26, 24, 6, true, true);
     // tail
     ctx.beginPath(); ctx.moveTo(8, 22); ctx.lineTo(-6, 16); ctx.lineTo(8, 30); ctx.closePath(); ctx.fill(); ctx.stroke();
     // head
     rr(24, 2, 20, 18, 6, true, true);
-    // snout
+    // snout (light blue accent)
+    ctx.fillStyle = '#3b82f6';
     rr(40, 9, 8, 9, 3, true, true);
-    // eye
-    ctx.shadowBlur = 8; ctx.shadowColor = CYAN; ctx.fillStyle = WHITE;
+    // eye (dark slate dot on the light head)
+    ctx.shadowBlur = 0; ctx.fillStyle = INK;
     ctx.beginPath(); ctx.arc(38, 9, 2.6, 0, 7); ctx.fill();
-    // back fin
-    ctx.fillStyle = MAG; ctx.shadowColor = MAG;
+    // back fin (pink accent)
+    ctx.fillStyle = MAG;
     ctx.beginPath(); ctx.moveTo(16, 14); ctx.lineTo(20, 6); ctx.lineTo(24, 14); ctx.closePath(); ctx.fill();
     // legs (animate when grounded)
-    ctx.strokeStyle = CYAN; ctx.shadowBlur = 6; ctx.shadowColor = CYAN; ctx.lineWidth = 3;
+    ctx.strokeStyle = INK; ctx.shadowBlur = 0; ctx.lineWidth = 3;
     const swing = dino.onGround ? Math.sin(dino.run) * 5 : 3;
     leg(16, 38, swing); leg(26, 38, -swing);
     ctx.restore();
@@ -176,12 +181,12 @@
     ctx.save();
     const c = o.glowColor;
     const w = o.w, h = o.h;
-    // dark panel background
-    ctx.shadowBlur = 18; ctx.shadowColor = c;
-    ctx.fillStyle = 'rgba(5,3,10,0.65)';
+    // light neutral panel background + soft slate shadow
+    ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(15, 23, 42,0.14)';
+    ctx.fillStyle = 'rgba(226, 232, 240,0.92)';
     rr(o.x, o.y, w, h, 7, true, false);
-    // glowing border
-    ctx.strokeStyle = c; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.8;
+    // colored border (blue / violet / pink)
+    ctx.strokeStyle = c; ctx.lineWidth = 1.75; ctx.globalAlpha = 0.9;
     rr(o.x, o.y, w, h, 7, false, true);
     ctx.globalAlpha = 1; ctx.shadowBlur = 0;
     // icon image

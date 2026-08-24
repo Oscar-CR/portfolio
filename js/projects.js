@@ -7,7 +7,7 @@
    demo UIs.
    ============================================================ */
 (function () {
-  const C = '18e8ff';
+  const C = '2563eb';
   const ico = (slug) => `https://cdn.simpleicons.org/${slug}/${C}`;
 
   // ---- data ----

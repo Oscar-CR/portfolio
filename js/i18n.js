@@ -110,9 +110,7 @@ window.I18N = {
   // certs
   "cert.eyebrow": { es: "Acreditaciones", en: "Credentials" },
   "cert.title":   { es: 'Cursos y <span class="accent">Certificados</span>', en: 'Courses & <span class="accent">Certificates</span>' },
-  "cert.desc":    { es: 'Selecciona una certificación para consultar sus detalles y enlace de verificación.', en: 'Select a certification to view its details and verification link.' },
-  "cert.hint":    { es: 'Pasa el cursor sobre una certificación', en: 'Hover over a certification' },
-  "cert.console": { es: 'CREDENCIALES PROFESIONALES', en: 'PROFESSIONAL CREDENTIALS' },
+  "cert.desc":    { es: 'Seis credenciales verificables. Cada tarjeta abre su página de verificación oficial.', en: 'Six verifiable credentials. Each card opens its official verification page.' },
   "cert.verify":  { es: 'Verificar credencial', en: 'Verify credential' },
   "c1.name": { es: "Desarrollo Móvil", en: "Mobile Development" },
   "c2.name": { es: "Proyecto Ganador · Móvil", en: "Winning Project · Mobile" },
@@ -149,15 +147,16 @@ window.I18N = {
                  en: "Mobile apps, AI-powered systems, process automation, web applications — I turn ideas into real products. Let's talk." },
   "footer.text": { es: "Diseñado y codificado por Oscar Chávez Rosales", en: "Designed & coded by Oscar Chávez Rosales" },
 
-  // ARIA assistant
-  "aria.sub":     { es: "Dyno AI · en línea", en: "Dyno AI · online" },
-  "aria.greet":   { es: "¡Rawr! 🦖 Soy Dyno, la IA mascota de Oscar. Pregúntame sobre su experiencia, stack, proyectos o cómo contactarlo.",
-                    en: "Rawr! 🦖 I'm Dyno, Oscar's AI mascot. Ask me about his experience, stack, projects, or how to reach him." },
+  // Profile assistant
+  "aria.name":    { es: "Asistente de perfil", en: "Profile assistant" },
+  "aria.sub":     { es: "En línea", en: "Online" },
+  "aria.greet":   { es: "Hola, soy el asistente de perfil de Oscar. Pregúntame sobre su experiencia, stack, proyectos o cómo contactarlo.",
+                    en: "Hi, I'm Oscar's profile assistant. Ask me about his experience, stack, projects, or how to reach him." },
   "aria.s1": { es: "¿Qué hace con IA?", en: "What does he do with AI?" },
   "aria.s2": { es: "Su stack principal", en: "His main stack" },
   "aria.s3": { es: "¿Cómo lo contacto?", en: "How do I contact him?" },
   "aria.placeholder": { es: "Pregunta sobre Oscar…", en: "Ask about Oscar…" },
-  "aria.thinking": { es: "ARIA está pensando", en: "ARIA is thinking" },
+  "aria.thinking": { es: "El asistente está pensando", en: "The assistant is thinking" },
   "aria.error": { es: "Ups, no pude procesar eso. Intenta de nuevo o escribe a oscar.chavez.dev@gmail.com.",
                   en: "Oops, I couldn't process that. Try again or email oscar.chavez.dev@gmail.com." },
   "game.hint":  { es: "DYNO RUNNER — pulsa ESPACIO o toca para saltar", en: "DYNO RUNNER — press SPACE or tap to jump" },

@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- Punto final del asistente. Vacío = responde solo con la base local.
+     Pon aquí la URL de tu Worker (backend/worker.js) para habilitar la IA. -->
+<meta name="assistant-endpoint" content="" />
 <title>Oscar Chávez Rosales — Portfolio</title>
 <meta name="description" content="Portafolio de Oscar Chávez Rosales — Ingeniero en TIC, desarrollo de software e IA." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.bunny.net" crossorigin />
+<link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600|jetbrains-mono:400,500,700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/cyber.css" />
 </head>
 <body>
@@ -69,14 +71,7 @@
       </div>
     </div>
     <div class="hero-stage">
-      <span class="mode-name" id="modeName">PERFIL 01</span>
       <canvas id="hero-canvas"></canvas>
-      <div class="mode-switch">
-        <span class="lbl">MODO</span>
-        <button data-mode="0" class="active">01</button>
-        <button data-mode="1">02</button>
-        <button data-mode="2">03</button>
-      </div>
     </div>
     <div class="scroll-hint">
       <span data-i18n="hero.scroll">Desplaza</span>
@@ -197,35 +192,10 @@
     <div class="section-head">
       <span class="eyebrow" data-i18n="cert.eyebrow">Acreditaciones</span>
       <h2 class="section-title" data-i18n="cert.title" data-i18n-html>Cursos y <span class="accent">Certificados</span></h2>
-      <p class="section-desc" data-i18n="cert.desc">Selecciona una certificación para consultar sus detalles y enlace de verificación.</p>
+      <p class="section-desc" data-i18n="cert.desc">Seis credenciales verificables. Cada tarjeta abre su página de verificación oficial.</p>
     </div>
 
-    <div class="holo-console bracket">
-      <div class="hc-head">
-        <span class="hc-dot"></span>
-        <span class="mono hc-title" data-i18n="cert.console">CREDENCIALES PROFESIONALES</span>
-        <span class="mono hc-id" id="hcCount">06 MÓDULOS</span>
-      </div>
-      <div class="hc-body">
-        <div class="hc-stage" id="hcStage">
-          <div class="hc-grid"></div>
-          <div class="hc-beam"></div>
-          <div class="holo-card" id="holoCard">
-            <div class="holo-ico" id="holoIco"></div>
-            <div class="holo-year mono" id="holoYear"></div>
-            <h3 class="holo-name" id="holoName"></h3>
-            <div class="holo-issuer mono" id="holoIssuer"></div>
-            <a class="holo-verify" id="holoVerify" target="_blank" rel="noopener">
-              <span data-i18n="cert.verify">Verificar credencial</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
-            </a>
-            <div class="holo-scan"></div>
-          </div>
-          <div class="hc-base"></div>
-        </div>
-        <div class="hc-selectors" id="hcSelectors"></div>
-      </div>
-    </div>
+    <div class="cert-grid" id="certGrid"></div>
   </section>
 
   <!-- ===== INFO · HOLO CARDS ===== -->
@@ -333,41 +303,24 @@
   <span data-i18n="footer.text">Diseñado y codificado por Oscar Chávez Rosales</span> · <span class="accent">2026</span>
 </footer>
 
-<!-- ===== DYNO AI ASSISTANT ===== -->
-<button class="aria-fab" id="aria-fab" aria-label="Abrir Dyno AI">
-  <!-- Dyno: same geometry as game.js drawDino(), viewBox spans tail(-8) to snout(50) -->
-  <svg class="dyno-glyph" viewBox="-8 0 58 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- tail -->
-    <path d="M8 22 L-6 16 L8 30 Z" fill="currentColor"/>
-    <!-- body -->
-    <rect x="8" y="14" width="26" height="24" rx="6" fill="#1a1330" stroke="currentColor" stroke-width="2"/>
-    <!-- head -->
-    <rect x="24" y="2" width="20" height="18" rx="6" fill="#1a1330" stroke="currentColor" stroke-width="2"/>
-    <!-- snout -->
-    <rect x="40" y="9" width="8" height="9" rx="3" fill="#1a1330" stroke="currentColor" stroke-width="2"/>
-    <!-- dorsal fin (magenta) -->
-    <path d="M16 14 L20 6 L24 14 Z" fill="#ff2bd6"/>
-    <!-- eye -->
-    <circle cx="38" cy="9" r="2.6" fill="#eafcff"/>
-    <!-- legs -->
-    <line x1="16" y1="38" x2="12" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-    <line x1="26" y1="38" x2="30" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+<!-- ===== PROFILE ASSISTANT ===== -->
+<button class="aria-fab" id="aria-fab" aria-label="Abrir asistente de perfil">
+  <!-- AI sparkle: one dominant four-point star plus a small companion (24x24) -->
+  <svg class="aria-glyph" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M10.2 2.8Q12.4 8.6 18.2 10.8Q12.4 13 10.2 18.8Q8 13 2.2 10.8Q8 8.6 10.2 2.8Z"/>
+    <path d="M19.6 15.9Q20.6 18.4 23.1 19.4Q20.6 20.4 19.6 22.9Q18.6 20.4 16.1 19.4Q18.6 18.4 19.6 15.9Z"/>
   </svg>
 </button>
 <div class="aria-panel" id="aria-panel">
   <div class="aria-header">
-    <span class="aria-orb"><svg viewBox="-8 0 58 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8 22 L-6 16 L8 30 Z" fill="#18e8ff"/>
-        <rect x="8" y="14" width="26" height="24" rx="6" fill="#05030a" stroke="#18e8ff" stroke-width="2"/>
-        <rect x="24" y="2" width="20" height="18" rx="6" fill="#05030a" stroke="#18e8ff" stroke-width="2"/>
-        <rect x="40" y="9" width="8" height="9" rx="3" fill="#05030a" stroke="#18e8ff" stroke-width="2"/>
-        <path d="M16 14 L20 6 L24 14 Z" fill="#ff2bd6"/>
-        <circle cx="38" cy="9" r="2.6" fill="#eafcff"/>
-        <line x1="16" y1="38" x2="12" y2="50" stroke="#18e8ff" stroke-width="3" stroke-linecap="round"/>
-        <line x1="26" y1="38" x2="30" y2="50" stroke="#18e8ff" stroke-width="3" stroke-linecap="round"/>
+    <span class="aria-orb"><svg viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M10.2 2.8Q12.4 8.6 18.2 10.8Q12.4 13 10.2 18.8Q8 13 2.2 10.8Q8 8.6 10.2 2.8Z"/>
+        <path d="M19.6 15.9Q20.6 18.4 23.1 19.4Q20.6 20.4 19.6 22.9Q18.6 20.4 16.1 19.4Q18.6 18.4 19.6 15.9Z"/>
       </svg></span>
-    <div class="who"><b>Dyno AI</b><small data-i18n="aria.sub">Dyno AI · en línea</small></div>
-    <button class="aria-close" id="aria-close" aria-label="close">✕</button>
+    <div class="who"><b data-i18n="aria.name">Asistente de perfil</b><small data-i18n="aria.sub">En línea</small></div>
+    <button class="aria-close" id="aria-close" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg>
+    </button>
   </div>
   <div class="aria-log" id="aria-log"></div>
   <div class="aria-suggest">
@@ -388,7 +341,7 @@
 <script>
 /* build tech marquees */
 (function () {
-  const C = '18e8ff';
+  const C = '2563eb';
   const rows = [
     [['html5','HTML5'],['css','CSS3'],['javascript','JavaScript'],['react','React'],['tailwindcss','Tailwind'],['bootstrap','Bootstrap'],['laravel','Laravel'],['flutter','Flutter']],
     [['openjdk','Java'],['dart','Dart'],['php','PHP'],['python','Python'],['mysql','MySQL'],['','Oracle DB'],['kotlin','Kotlin'],['swift','Swift']],

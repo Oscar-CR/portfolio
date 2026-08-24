@@ -38,23 +38,6 @@
   }, { rootMargin: '-45% 0px -50% 0px' });
   sections.forEach(s => navObserver.observe(s));
 
-  /* ---------- hero mode switch ---------- */
-  const modeNames = ['PERFIL 01', 'PERFIL 02', 'PERFIL 03'];
-  const modeNameEl = document.getElementById('modeName');
-  document.querySelectorAll('.mode-switch button').forEach(b => {
-    b.addEventListener('click', function () {
-      const btns = document.querySelectorAll('.mode-switch button');
-      const n = +this.dataset.mode;
-      btns.forEach(x => x.classList.remove('active'));
-      this.classList.add('active');
-      if (window.HeroScene) window.HeroScene.setMode(n);
-      if (modeNameEl) modeNameEl.textContent = modeNames[n];
-      if (anime && !reduced) {
-        anime({ targets: '#hero-canvas', scale: [0.94, 1], opacity: [0.4, 1], duration: 600, easing: 'easeOutExpo' });
-      }
-    });
-  });
-
   /* ---------- scroll reveals ---------- */
   function reveal(el) {
     if (reduced || !anime) { el.style.opacity = 1; return; }
@@ -83,7 +66,7 @@
       .add({ targets: '.hero-role', opacity: [0, 1], translateY: [20, 0], duration: 700 }, '-=500')
       .add({ targets: '.hero-tag', opacity: [0, 1], translateY: [16, 0], scale: [0.9, 1], delay: anime.stagger(70), duration: 500 }, '-=400')
       .add({ targets: '.hero-cta .btn', opacity: [0, 1], translateY: [16, 0], delay: anime.stagger(90), duration: 500 }, '-=300')
-      .add({ targets: '.mode-switch, .scroll-hint', opacity: [0, 1], duration: 500 }, '-=200');
+      .add({ targets: '.scroll-hint', opacity: [0, 1], duration: 500 }, '-=200');
   }
 
   /* ---------- ricing slideshow (info section) ---------- */

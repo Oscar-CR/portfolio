@@ -1,7 +1,7 @@
 /* ============================================================
-   certs.js — Holographic credential projector console.
-   A single holo-card projects the selected certificate; a row
-   of selector chips switches modules with a re-projection FX.
+   certs.js — credential grid. All six render at once and every
+   card is itself the link to its official verification page:
+   nothing rotates, nothing has to be selected to be read.
    ============================================================ */
 (function () {
   const CERTS = [
@@ -18,86 +18,54 @@
     { key: 'c6', kind: 'ai', url: 'https://view.pok.tech/c/0f18fe43-acf3-4bf2-9b37-bc8711f6e5e1',
       name: { es: 'Prototype · IA y ML', en: 'Prototype · AI & ML' }, code: 'AI-PROTO', year: '2025' }
   ];
-  const ISSUER = 'BEDU + Santander Universidades';
+
   const ICONS = {
-    badge: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 7 5-3 5 3-1.5-7"/></svg>',
-    trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 4h12v4a6 6 0 0 1-12 0V4Z"/><path d="M6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M9 20h6M12 14v6"/></svg>',
-    scrum: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M21 12a9 9 0 1 1-3.5-7.1"/><path d="M21 4v5h-5"/></svg>',
-    ai: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/><circle cx="12" cy="12" r="2.5"/></svg>'
+    badge: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 7 5-3 5 3-1.5-7"/></svg>',
+    trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M6 4h12v4a6 6 0 0 1-12 0V4Z"/><path d="M6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M9 20h6M12 14v6"/></svg>',
+    scrum: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3.5-7.1"/><path d="M21 4v5h-5"/></svg>',
+    ai: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/><circle cx="12" cy="12" r="2.5"/></svg>'
+  };
+  const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>';
+
+  function L(o) { const l = window.CURRENT_LANG || 'es'; return o[l] != null ? o[l] : o.es; }
+  // read straight from the shared dictionary so these strings stay in one place
+  function T(key, fallback) {
+    const e = window.I18N && window.I18N[key];
+    return e ? L(e) : fallback;
+  }
+
+  let grid = null;
+
+  function render() {
+    if (!grid) return;
+    const verify = T('cert.verify', 'Verificar credencial');
+    const issuer = T('cert.issuer', 'BEDU + Santander Universidades');
+    grid.innerHTML = '';
+    CERTS.forEach((c) => {
+      const a = document.createElement('a');
+      a.className = 'cert-card kind-' + c.kind;
+      a.href = c.url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.innerHTML =
+        '<span class="cert-ico">' + ICONS[c.kind] + '</span>' +
+        '<span class="cert-code">' + c.code + ' · ' + c.year + '</span>' +
+        '<h3 class="cert-name">' + L(c.name) + '</h3>' +
+        '<span class="cert-issuer">' + issuer + '</span>' +
+        '<span class="cert-verify">' + verify + ARROW + '</span>';
+      grid.appendChild(a);
+    });
+  }
+
+  // keep the cards in sync when the visitor switches language
+  const origApply = window.applyLang;
+  window.applyLang = function (lang) {
+    if (origApply) origApply(lang);
+    render();
   };
 
-  let active = 0, els = {}, autoTimer = null;
-  function L(o) { const l = window.CURRENT_LANG || 'es'; return o[l] != null ? o[l] : o.es; }
-
-  function project(i, manual) {
-    active = (i + CERTS.length) % CERTS.length;
-    const c = CERTS[active];
-    const card = els.card;
-    // re-projection flicker
-    card.classList.remove('on');
-    card.classList.add('reproj');
-    setTimeout(() => {
-      els.ico.innerHTML = ICONS[c.kind];
-      els.ico.className = 'holo-ico kind-' + c.kind;
-      els.name.textContent = L(c.name);
-      els.year.textContent = c.code + ' · ' + c.year;
-      els.issuer.textContent = ISSUER;
-      els.verify.href = c.url;
-      card.classList.remove('reproj');
-      card.classList.add('on');
-    }, 160);
-    // selector states
-    els.selectors.querySelectorAll('.hc-chip').forEach((b, idx) => b.classList.toggle('active', idx === active));
-    if (manual) restartAuto();
-  }
-
-  function buildSelectors() {
-    els.selectors.innerHTML = '';
-    CERTS.forEach((c, i) => {
-      const b = document.createElement('button');
-      b.className = 'hc-chip kind-' + c.kind;
-      b.innerHTML = `<span class="chip-ico">${ICONS[c.kind]}</span><span class="chip-txt">${L(c.name)}</span>`;
-      b.addEventListener('click', () => project(i, true));
-      els.selectors.appendChild(b);
-    });
-  }
-
-  function restartAuto() {
-    if (autoTimer) clearInterval(autoTimer);
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    autoTimer = setInterval(() => project(active + 1, false), 5200);
-  }
-
-  // pointer tilt on the stage for holographic parallax
-  function tilt(stage, card) {
-    stage.addEventListener('pointermove', (e) => {
-      const r = stage.getBoundingClientRect();
-      const mx = (e.clientX - r.left) / r.width - 0.5;
-      const my = (e.clientY - r.top) / r.height - 0.5;
-      card.style.transform = `rotateX(${ -my * 12 }deg) rotateY(${ mx * 16 }deg)`;
-    });
-    stage.addEventListener('pointerleave', () => { card.style.transform = ''; });
-  }
-
-  const origApply = window.applyLang;
-  window.applyLang = function (lang) { origApply(lang); if (els.selectors) { buildSelectors(); const a = active; active = -1; project(a, false); } };
-
   document.addEventListener('DOMContentLoaded', () => {
-    const stage = document.getElementById('hcStage');
-    if (!stage) return;
-    els = {
-      stage, card: document.getElementById('holoCard'), ico: document.getElementById('holoIco'),
-      name: document.getElementById('holoName'), year: document.getElementById('holoYear'),
-      issuer: document.getElementById('holoIssuer'), verify: document.getElementById('holoVerify'),
-      selectors: document.getElementById('hcSelectors')
-    };
-    buildSelectors();
-    project(0, false);
-    tilt(stage, els.card);
-    // start auto-rotate when scrolled into view
-    const io = new IntersectionObserver((ents) => {
-      ents.forEach(en => { if (en.isIntersecting) restartAuto(); else if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } });
-    }, { threshold: 0.3 });
-    io.observe(stage);
+    grid = document.getElementById('certGrid');
+    render();
   });
 })();
